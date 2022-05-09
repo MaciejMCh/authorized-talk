@@ -17,7 +17,7 @@ class SslMedium(Medium):
         return SslMedium('localhost', port)
 
     async def didConnect(self, websocket, path):
-        session = Session()
+        session = SslSession(websocket)
         self.incomingSessions.append(session)
         while True:
             result = await websocket.recv()

@@ -15,7 +15,6 @@ class SslMediumTestCase(IsolatedAsyncioTestCase):
         annasSession = await anna.connectTo(bob.url())
 
         def handleIncomingMessageAsBob(message: str):
-            print('handle handleIncomingMessageAsBob')
             nonlocal result
             result = message
 

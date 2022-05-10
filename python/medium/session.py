@@ -9,6 +9,7 @@ class Session:
         raise Exception('dont use this base class')
 
     def handleMessage(self, message: str):
+        print(f'receiving: {message}')
         if self.handler is not None:
             self.handler(message)
 

@@ -1,7 +1,7 @@
 import unittest
 
 from tests.testSuite import TestSuite
-from whisper import sendWhisper, Whisper
+from whisper import Whisper
 
 
 class MyTestCase(unittest.TestCase):

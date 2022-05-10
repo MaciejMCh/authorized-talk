@@ -1,7 +1,11 @@
 import os
+import time
+from threading import Thread
+
 from blockchain import Blockchain
 from meTalker import MeTalker
 from medium.sslMedium import SslMedium
+from talker.talkerIdentity import TalkerIdentity
 
 
 def makeGanacheBlockchain():
@@ -9,12 +13,21 @@ def makeGanacheBlockchain():
 
 
 def smartContractSolFilePath():
-    return os.path.join('..', '..', 'solidity', 'AuthorizedTalk.sol')
+    path = os.path.abspath(os.path.join(__file__, '..', '..', '..', 'solidity', 'AuthorizedTalk.sol'))
+    return path
 
 
 class TestSuite:
     def __init__(self):
         self.blockchain = makeGanacheBlockchain()
         self.smartContract = self.blockchain.compileAndPublishSmartContract(smartContractSolFilePath())
-        self.anna = MeTalker(SslMedium.local('9991'))
-        self.bob = MeTalker(SslMedium.local('9992'))
+        self.anna = MeTalker(
+            talkerIdentity=TalkerIdentity('anna'),
+            sslMedium=SslMedium.local(8765),
+            smartContract=self.smartContract,
+        )
+        self.bob = MeTalker(
+            talkerIdentity=TalkerIdentity('bob'),
+            sslMedium=SslMedium.local(8766),
+            smartContract=self.smartContract,
+        )

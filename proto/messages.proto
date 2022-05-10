@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message Introduction {
+  string pseudonym = 1;
+  string signature = 2;
+}

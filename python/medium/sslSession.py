@@ -1,3 +1,6 @@
+import asyncio
+from threading import Thread
+
 from medium.session import Session
 
 
@@ -6,5 +9,12 @@ class SslSession(Session):
         super(SslSession, self).__init__()
         self.websocket = websocket
 
-    async def send(self, message: str):
-        await self.websocket.send(message)
+    def send(self, message: str):
+        print(f'sending: {message}')
+        if self.websocket is None:
+            raise Exception(f'websocket is not initialized {self}')
+
+        async def do():
+            await self.websocket.send(message)
+
+        Thread(target=asyncio.new_event_loop().run_until_complete, args=[do()]).start()

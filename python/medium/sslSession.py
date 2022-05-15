@@ -17,4 +17,8 @@ class SslSession(Session):
         async def do():
             await self.websocket.send(message)
 
-        Thread(target=asyncio.new_event_loop().run_until_complete, args=[do()]).start()
+        thread = Thread(target=asyncio.new_event_loop().run_until_complete, args=[do()])
+        thread.start()
+
+    def close(self):
+        self.websocket.close()

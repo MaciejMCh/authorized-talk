@@ -1,7 +1,7 @@
 import unittest
 
 from tests.testSuite import TestSuite
-from whisper import Whisper
+from whisper.whisper import Whisper
 
 
 class MyTestCase(unittest.TestCase):
@@ -15,7 +15,7 @@ class MyTestCase(unittest.TestCase):
 
         testSuite.bob.medium.onWhisper(handleWhisperReceive)
         bobsMedium = testSuite.anna.requestMedium(testSuite.bob.identity, 'hello')
-        sendWhisper(testSuite.anna.meTalker.medium, Whisper('Hello'), bobsMedium)
+        Whisper(meTalker=testSuite.anna, target=bobsMedium)
 
         self.assertEqual(result, "Hello", "Should be Hello")
 

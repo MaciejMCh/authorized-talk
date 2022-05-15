@@ -15,3 +15,6 @@ class Session:
 
     def onMessage(self, handler: Callable[[str], None]):
         self.handler = handler
+
+    def close(self):
+        raise Exception('dont use this base class')

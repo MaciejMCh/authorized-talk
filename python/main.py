@@ -1,15 +1,23 @@
 import asyncio
 import time
 
+from encryption.unsafeEncryption import UnsafeEncryption
 from medium.sslMedium import SslMedium
 from talker.talkerInterfaceIdentity import TalkerInterfaceIdentity
 from tests.testSuite import TestSuite
-from whisper import Whisper
+from whisper.whisper import Whisper
 
 
 def main():
+    encryption = UnsafeEncryption('', '')
+    cypher = encryption.signWithPrivateKey('siema')
+    verified = encryption.verifyWithPublicKey(cypher, 'siema')
+
+    # encryption = UnsafeEncryption('', '')
+    # cypher = encryption.codeWithPublicKey('siema')
+    # encoded = encryption.encodeWithPrivateKey(cypher)
+    return
     testSuite = TestSuite()
-    time.sleep(1)
     whisper = Whisper(
         meTalker=testSuite.anna,
         target=testSuite.bob.talkerIdentity,

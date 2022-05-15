@@ -1,8 +1,6 @@
 import os
-import time
-from threading import Thread
-
 from blockchain import Blockchain
+from encryption.unsafeEncryption import UnsafeEncryption
 from meTalker import MeTalker
 from medium.sslMedium import SslMedium
 from talker.talkerIdentity import TalkerIdentity
@@ -23,11 +21,13 @@ class TestSuite:
         self.smartContract = self.blockchain.compileAndPublishSmartContract(smartContractSolFilePath())
         self.anna = MeTalker(
             talkerIdentity=TalkerIdentity('anna'),
+            encryption=UnsafeEncryption(),
             sslMedium=SslMedium.local(8765),
             smartContract=self.smartContract,
         )
         self.bob = MeTalker(
             talkerIdentity=TalkerIdentity('bob'),
+            encryption=UnsafeEncryption(),
             sslMedium=SslMedium.local(8766),
             smartContract=self.smartContract,
         )

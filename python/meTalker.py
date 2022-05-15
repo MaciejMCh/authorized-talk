@@ -1,5 +1,6 @@
 from typing import Callable, Optional
 
+from encryption.encryption import Encryption
 from medium.connection import Connection, SslConnection
 from medium.medium import Medium, MediumKind
 from medium.sslMedium import SslMedium
@@ -9,8 +10,15 @@ from talker.talkerInterfaceIdentity import TalkerInterfaceIdentity
 
 
 class MeTalker:
-    def __init__(self, talkerIdentity: TalkerIdentity, sslMedium: SslMedium, smartContract: SmartContract):
+    def __init__(
+        self,
+        talkerIdentity: TalkerIdentity,
+        encryption: Encryption,
+        sslMedium: SslMedium,
+        smartContract: SmartContract,
+    ):
         self.talkerIdentity = talkerIdentity
+        self.encryption = encryption
         self.sslMedium = sslMedium
         self.smartContract = smartContract
         self.setup()

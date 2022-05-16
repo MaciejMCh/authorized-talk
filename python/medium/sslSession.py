@@ -9,7 +9,9 @@ class SslSession(Session):
         super(SslSession, self).__init__()
         self.websocket = websocket
 
-    def send(self, message: str):
+    def send(self, message: bytes):
+        if not isinstance(message, bytes):
+            raise Exception('message must be bytes')
         print(f'sending: {message}')
         if self.websocket is None:
             raise Exception(f'websocket is not initialized {self}')

@@ -1,6 +1,6 @@
 import asyncio
 from threading import Thread, Lock
-from typing import List
+from typing import List, Callable, Optional
 from medium.medium import Medium
 from websockets import connect, serve
 from medium.session import Session
@@ -12,6 +12,7 @@ class SslMedium(Medium):
         self.host = host
         self.port = port
         self.incomingSessions: List[Session] = []
+        self.routeSessionHandler: Optional[Callable[[SslSession], None]] = None
         Thread(target=self.openIncomingConnections).start()
 
     @classmethod
@@ -21,6 +22,8 @@ class SslMedium(Medium):
     async def didConnect(self, websocket, path):
         session = SslSession(websocket)
         self.incomingSessions.append(session)
+        if self.routeSessionHandler is not None:
+            self.routeSessionHandler(session)
         while True:
             result = await websocket.recv()
             session.handleMessage(result)
@@ -33,6 +36,9 @@ class SslMedium(Medium):
 
     def url(self):
         return f'ws://{self.host}:{self.port}'
+
+    def routeIncoming(self, routeSessionHandler: Callable[[SslSession], None]):
+        self.routeSessionHandler = routeSessionHandler
 
     def connectTo(self, url: str) -> Session:
         session = SslSession(None)

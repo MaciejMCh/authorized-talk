@@ -1,7 +1,8 @@
 import unittest
 
+from talker.talkerInterfaceIdentity import TalkerInterfaceIdentity
 from tests.testSuite import TestSuite
-from whisper.whisper import Whisper
+from whisper.whisperingMouth import WhisperingMouth
 
 
 class MyTestCase(unittest.TestCase):
@@ -13,9 +14,11 @@ class MyTestCase(unittest.TestCase):
             nonlocal result
             result = message
 
-        testSuite.bob.medium.onWhisper(handleWhisperReceive)
-        bobsMedium = testSuite.anna.requestMedium(testSuite.bob.identity, 'hello')
-        Whisper(meTalker=testSuite.anna, target=bobsMedium)
+        WhisperingMouth(
+            meTalker=testSuite.anna,
+            target=testSuite.bob.talkerIdentity,
+            targetInterface=TalkerInterfaceIdentity('hello'),
+        )
 
         self.assertEqual(result, "Hello", "Should be Hello")
 

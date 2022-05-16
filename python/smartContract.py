@@ -14,10 +14,7 @@ class SmartContract:
     def registerTalker(self, pseudonym: str, sslUrl: str):
         raise Exception('dont use this base class')
 
-    def debug(self, val: int):
-        raise Exception('dont use this base class')
-
-    def debug2(self):
+    def getPublicKey(self, pseudonym: str):
         raise Exception('dont use this base class')
 
 

@@ -4,9 +4,11 @@ from encryption.encryption import Encryption
 from medium.connection import Connection, SslConnection
 from medium.medium import Medium, MediumKind
 from medium.sslMedium import SslMedium
+from medium.sslSession import SslSession
 from smartContract import SmartContract
 from talker.talkerIdentity import TalkerIdentity
 from talker.talkerInterfaceIdentity import TalkerInterfaceIdentity
+from whisper.whisperingEar import WhisperingEar
 
 
 class MeTalker:
@@ -28,7 +30,14 @@ class MeTalker:
             pseudonym=self.talkerIdentity.pseudonym,
             sslUrl=self.sslMedium.url(),
         )
+        self.sslMedium.routeIncoming(self.routeIncomingSession)
 
     def requestConnection(self, target: TalkerIdentity, interface: TalkerInterfaceIdentity) -> Connection:
         result = self.smartContract.requestConnection(target.pseudonym, interface.name)
         return SslConnection(result)
+
+    def routeIncomingSession(self, session: SslSession):
+        WhisperingEar(session=session, ms=self.smartContract)
+
+    def registerInterface(self, identity: TalkerInterfaceIdentity):
+        pass

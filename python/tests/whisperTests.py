@@ -1,3 +1,4 @@
+import time
 import unittest
 
 from talker.talkerInterfaceIdentity import TalkerInterfaceIdentity
@@ -5,7 +6,7 @@ from tests.testSuite import TestSuite
 from whisper.whisperingMouth import WhisperingMouth
 
 
-class MyTestCase(unittest.TestCase):
+class WhisperTestCase(unittest.TestCase):
     def testSendWhisper(self):
         result = ""
         testSuite = TestSuite()
@@ -19,6 +20,8 @@ class MyTestCase(unittest.TestCase):
             target=testSuite.bob.talkerIdentity,
             targetInterface=TalkerInterfaceIdentity('hello'),
         )
+
+        time.sleep(2)
 
         self.assertEqual(result, "Hello", "Should be Hello")
 

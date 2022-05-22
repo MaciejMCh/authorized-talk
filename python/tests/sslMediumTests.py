@@ -27,8 +27,8 @@ class SslMediumTestCase(unittest.TestCase):
 
     def testSendMessageAsServer(self):
         result = ''
-        anna = SslMedium.local(8765)
-        bob = SslMedium.local(8766)
+        anna = SslMedium.local(8768)
+        bob = SslMedium.local(8769)
         time.sleep(1.2)
 
         annaSession = anna.connectTo(bob.url())
@@ -39,10 +39,10 @@ class SslMediumTestCase(unittest.TestCase):
 
         time.sleep(1.2)
         annaSession.onMessage(handleIncomingMessageAsAnna)
-        bob.incomingSessions[0].send('hello')
+        bob.incomingSessions[0].send(b'hello')
         time.sleep(.2)
 
-        self.assertEqual('hello', result)
+        self.assertEqual(b'hello', result)
         annaSession.close()
 
 

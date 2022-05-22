@@ -11,7 +11,7 @@ class SmartContract:
     def requestConnection(self, targetPseudonym: str, interface: str):
         raise Exception('dont use this base class')
 
-    def registerTalker(self, pseudonym: str, sslUrl: str):
+    def registerTalker(self, pseudonym: str, sslUrl: str, publicKey: str):
         raise Exception('dont use this base class')
 
     def getPublicKey(self, pseudonym: str):
@@ -37,14 +37,11 @@ class SolSmartContract(SmartContract):
     def requestConnection(self, targetPseudonym: str, interface: str):
         return self.w3Contract.functions.requestConnection(targetPseudonym, interface).call()
 
-    def registerTalker(self, pseudonym: str, sslUrl: str):
-        return self.waitForTransaction(self.w3Contract.functions.registerTalker(pseudonym, [sslUrl]))
+    def registerTalker(self, pseudonym: str, sslUrl: str, publicKey: str):
+        return self.waitForTransaction(self.w3Contract.functions.registerTalker(pseudonym, [sslUrl], publicKey))
 
-    def debug(self, val: int):
-        return self.waitForTransaction(self.w3Contract.functions.debug(val))
-
-    def debug2(self):
-        return self.w3Contract.functions.debug2().call()
+    def getPublicKey(self, pseudonym: str):
+        return self.w3Contract.functions.getPublicKey(pseudonym).call()
 
 
 def compileAndPublish(w3: Web3, solFilePath: str):

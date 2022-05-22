@@ -4,3 +4,7 @@ class WhisperingEarState:
 
 class WaitingForIntroduction(WhisperingEarState):
     pass
+
+
+class RejectedIntroduction(WhisperingEarState):
+    pass

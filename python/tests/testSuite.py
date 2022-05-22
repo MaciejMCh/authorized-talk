@@ -22,12 +22,12 @@ class TestSuite:
         self.anna = MeTalker(
             talkerIdentity=TalkerIdentity('anna'),
             encryption=UnsafeEncryption(),
-            sslMedium=SslMedium.local(8765),
+            sslMedium=SslMedium.local(8771),
             smartContract=self.smartContract,
         )
         self.bob = MeTalker(
             talkerIdentity=TalkerIdentity('bob'),
             encryption=UnsafeEncryption(),
-            sslMedium=SslMedium.local(8766),
+            sslMedium=SslMedium.local(8772),
             smartContract=self.smartContract,
         )

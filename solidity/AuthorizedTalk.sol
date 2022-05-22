@@ -9,15 +9,10 @@ contract AuthorizedTalk {
         address walletAddress;
         string pseudonym;
         SslConnection sslConnection;
+        string publicKey;
     }
 
     mapping (string => Talker) talkersByPseudonyms;
-
-    mapping (int => string) qqq;
-
-    string aaaa;
-
-    uint256 number;
 
     constructor() public {}
 
@@ -30,19 +25,17 @@ contract AuthorizedTalk {
         return talker.sslConnection.url;
     }
 
-    function registerTalker(string memory pseudonym, SslConnection calldata sslConnection) public {
+    function getPublicKey(string memory targetPseudonym) public returns (string memory) {
+        Talker memory talker = talkersByPseudonyms[targetPseudonym];
+        return talker.publicKey;
+    }
+
+    function registerTalker(string memory pseudonym, SslConnection calldata sslConnection, string memory publicKey) public {
         talkersByPseudonyms[pseudonym] = Talker({
             walletAddress: msg.sender,
             pseudonym: pseudonym,
-            sslConnection: sslConnection
+            sslConnection: sslConnection,
+            publicKey: publicKey
         });
-    }
-
-    function debug(uint256 num) public {
-        number = num;
-    }
-
-    function debug2() public view returns (uint256) {
-        return number;
     }
 }

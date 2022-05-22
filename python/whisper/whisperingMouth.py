@@ -17,6 +17,7 @@ class WhisperingMouth:
             targetInterface: TalkerInterfaceIdentity,
     ):
         self.meTalker = meTalker
+        self.target = target
         self.clientState: WhisperClientState = InitialWhisperClientState()
         self.session: Optional[Session] = None
 
@@ -40,8 +41,10 @@ class WhisperingMouth:
         pseudonym = self.meTalker.talkerIdentity.pseudonym
         signature = self.meTalker.encryption.signWithPrivateKey(pseudonym)
         introduction = Introduction(pseudonym=pseudonym, signature=signature)
+        targetPublicKey = self.meTalker.smartContract.getPublicKey(self.target.pseudonym)
         message: bytes = introduction.SerializeToString()
-        session.send(message)
+        cipher = self.meTalker.encryption.codeBytesWithOtherPublicKey(message, targetPublicKey)
+        session.send(cipher)
 
     def handleMessage(self, message: bytes):
         pass

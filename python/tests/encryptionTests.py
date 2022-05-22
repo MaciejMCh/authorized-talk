@@ -16,6 +16,13 @@ class EncryptionTestCase(unittest.TestCase):
         verification = encryption.verifyWithPublicKey(coded, 'hello')
         self.assertEqual(True, verification)
 
+    def testCodeLargeMessage(self):
+        encryption = UnsafeEncryption()
+        largeMessage = 'hffello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_hello_helloX'
+        coded = encryption.codeWithPublicKey(largeMessage)
+        encoded = encryption.encodeWithPrivateKey(coded)
+        self.assertEqual(largeMessage, encoded)
+
 
 if __name__ == '__main__':
     unittest.main()

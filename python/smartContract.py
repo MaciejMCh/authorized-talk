@@ -17,6 +17,9 @@ class SmartContract:
     def getPublicKey(self, pseudonym: str):
         raise Exception('dont use this base class')
 
+    def canAccess(self, sourcePseudonym: str, targetInterface: str) -> bool:
+        raise Exception('dont use this base class')
+
 
 class SolSmartContract(SmartContract):
     def __init__(self, w3: Web3, w3Contract: Union[Type[Contract], Contract]):
@@ -42,6 +45,9 @@ class SolSmartContract(SmartContract):
 
     def getPublicKey(self, pseudonym: str):
         return self.w3Contract.functions.getPublicKey(pseudonym).call()
+
+    def canAccess(self, sourcePseudonym: str, targetInterface: str) -> bool:
+        return self.w3Contract.functions.canAccess(sourcePseudonym, targetInterface).call()
 
 
 def compileAndPublish(w3: Web3, solFilePath: str):

@@ -3,10 +3,11 @@ from typing import Optional
 from meTalker import MeTalker
 from medium.connection import SslConnection
 from medium.session import Session
-from messages.whisperControl_pb2 import Introduction
+from messages.whisperControl_pb2 import Introduction, AccessPass
 from talker.talkerIdentity import TalkerIdentity
 from talker.talkerInterfaceIdentity import TalkerInterfaceIdentity
-from whisper.whisperMouthState import WhisperClientState, InitialWhisperClientState
+from whisper.signatures import introductionSignature
+from whisper.whisperMouthState import WhisperMouthState, Initial, WaitingForPass, Opened, RejectedPass
 
 
 class WhisperingMouth:
@@ -18,7 +19,7 @@ class WhisperingMouth:
     ):
         self.meTalker = meTalker
         self.target = target
-        self.clientState: WhisperClientState = InitialWhisperClientState()
+        self.state: WhisperMouthState = Initial()
         self.session: Optional[Session] = None
 
         targetConnection = meTalker.requestConnection(
@@ -26,25 +27,52 @@ class WhisperingMouth:
             interface=targetInterface,
         )
         if isinstance(targetConnection, SslConnection):
-            Thread(target=self.whisperUsingSsl, args=[meTalker, targetConnection]).start()
+            Thread(target=self.whisperUsingSsl, args=[meTalker, targetConnection, targetInterface]).start()
 
-    def whisperUsingSsl(self, meTalker: MeTalker, sslConnection: SslConnection):
+    def updateState(self, state: WhisperMouthState):
+        print(f'update mouth state: {state}')
+        self.state = state
+
+    def whisperUsingSsl(self, meTalker: MeTalker, sslConnection: SslConnection, interface: TalkerInterfaceIdentity):
         session = meTalker.sslMedium.connectTo(sslConnection.url)
         self.session = session
-        self.continueWithSession(session)
+        self.continueWithSession(session=session, interface=interface)
 
-    def continueWithSession(self, session: Session):
+    def continueWithSession(self, session: Session, interface: TalkerInterfaceIdentity):
         session.onMessage(self.handleMessage)
-        self.introduce(session)
+        self.introduce(session=session, interface=interface)
 
-    def introduce(self, session: Session):
+    def introduce(self, session: Session, interface: TalkerInterfaceIdentity):
         pseudonym = self.meTalker.talkerIdentity.pseudonym
-        signature = self.meTalker.encryption.signWithPrivateKey(pseudonym)
-        introduction = Introduction(pseudonym=pseudonym, signature=signature)
+        targetInterface = interface.name
+        signature = self.meTalker.encryption.signWithPrivateKey(introductionSignature(pseudonym=pseudonym, targetInterface=targetInterface))
+        introduction = Introduction(pseudonym=pseudonym, targetInterface=targetInterface, signature=signature)
         targetPublicKey = self.meTalker.smartContract.getPublicKey(self.target.pseudonym)
         message: bytes = introduction.SerializeToString()
         cipher = self.meTalker.encryption.codeBytesWithOtherPublicKey(message, targetPublicKey)
+        self.updateState(WaitingForPass())
         session.send(cipher)
 
     def handleMessage(self, message: bytes):
-        pass
+        if isinstance(self.state, WaitingForPass):
+            self.handleMessageWaitingForPass(message)
+
+    def handleMessageWaitingForPass(self, message: bytes):
+        accessPass = AccessPass()
+        accessPass.ParseFromString(message)
+        publicKeyString = self.meTalker.smartContract.getPublicKey(self.target.pseudonym)
+        isVerified = self.meTalker.encryption.verifyWithOtherPublicKey(
+            raw=accessPass.signature,
+            expected=self.target.pseudonym,
+            publicKeyString=publicKeyString,
+        )
+        if isVerified:
+            self.confirmPass()
+        else:
+            self.rejectPass()
+
+    def confirmPass(self):
+        self.updateState(Opened())
+
+    def rejectPass(self):
+        self.updateState(RejectedPass())

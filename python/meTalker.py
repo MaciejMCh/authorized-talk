@@ -38,7 +38,12 @@ class MeTalker:
         return SslConnection(result)
 
     def routeIncomingSession(self, session: SslSession):
-        WhisperingEar(session=session, smartContract=self.smartContract, encryption=self.encryption)
+        WhisperingEar(
+            pseudonym=self.talkerIdentity.pseudonym,
+            session=session,
+            smartContract=self.smartContract,
+            encryption=self.encryption,
+        )
 
     def registerInterface(self, identity: TalkerInterfaceIdentity):
         pass

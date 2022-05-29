@@ -14,11 +14,12 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14whisperControl.proto\"4\n\x0cIntroduction\x12\x11\n\tpseudonym\x18\x01 \x01(\t\x12\x11\n\tsignature\x18\x02 \x01(\tb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x14whisperControl.proto\"M\n\x0cIntroduction\x12\x11\n\tpseudonym\x18\x01 \x01(\t\x12\x17\n\x0ftargetInterface\x18\x02 \x01(\t\x12\x11\n\tsignature\x18\x03 \x01(\t\"\x1f\n\nAccessPass\x12\x11\n\tsignature\x18\x01 \x01(\tb\x06proto3')
 
 
 
 _INTRODUCTION = DESCRIPTOR.message_types_by_name['Introduction']
+_ACCESSPASS = DESCRIPTOR.message_types_by_name['AccessPass']
 Introduction = _reflection.GeneratedProtocolMessageType('Introduction', (_message.Message,), {
   'DESCRIPTOR' : _INTRODUCTION,
   '__module__' : 'whisperControl_pb2'
@@ -26,9 +27,18 @@ Introduction = _reflection.GeneratedProtocolMessageType('Introduction', (_messag
   })
 _sym_db.RegisterMessage(Introduction)
 
+AccessPass = _reflection.GeneratedProtocolMessageType('AccessPass', (_message.Message,), {
+  'DESCRIPTOR' : _ACCESSPASS,
+  '__module__' : 'whisperControl_pb2'
+  # @@protoc_insertion_point(class_scope:AccessPass)
+  })
+_sym_db.RegisterMessage(AccessPass)
+
 if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   _INTRODUCTION._serialized_start=24
-  _INTRODUCTION._serialized_end=76
+  _INTRODUCTION._serialized_end=101
+  _ACCESSPASS._serialized_start=103
+  _ACCESSPASS._serialized_end=134
 # @@protoc_insertion_point(module_scope)

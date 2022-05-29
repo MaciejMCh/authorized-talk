@@ -5,6 +5,11 @@ contract AuthorizedTalk {
         string url;
     }
 
+    struct Interface {
+        string name;
+        string[] whitelist;
+    }
+
     struct Talker {
         address walletAddress;
         string pseudonym;
@@ -13,6 +18,10 @@ contract AuthorizedTalk {
     }
 
     mapping (string => Talker) talkersByPseudonyms;
+
+    mapping (address => Talker) talkersByAddresses;
+
+    mapping (string => Interface) interfacesByIdentities;
 
     constructor() public {}
 
@@ -31,11 +40,24 @@ contract AuthorizedTalk {
     }
 
     function registerTalker(string memory pseudonym, SslConnection calldata sslConnection, string memory publicKey) public {
-        talkersByPseudonyms[pseudonym] = Talker({
+        Talker memory talker = Talker({
             walletAddress: msg.sender,
             pseudonym: pseudonym,
             sslConnection: sslConnection,
             publicKey: publicKey
         });
+        talkersByPseudonyms[talker.pseudonym] = talker;
+        talkersByAddresses[talker.walletAddress] = talker;
+    }
+
+    function canAccess(string memory sourcePseudonym, string memory targetInterface) public returns (bool) {
+        Talker memory meTalker = talkersByAddresses[msg.sender];
+        string memory interfaceId = this.interfaceIdentity(meTalker.pseudonym, targetInterface);
+        Interface memory interf = interfacesByIdentities[interfaceId];
+        return true;
+    }
+
+    function interfaceIdentity(string memory pseudonym, string memory targetInterface) public returns (string memory) {
+        return string(abi.encodePacked(pseudonym, targetInterface));
     }
 }

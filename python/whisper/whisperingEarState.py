@@ -8,3 +8,15 @@ class WaitingForIntroduction(WhisperingEarState):
 
 class RejectedIntroduction(WhisperingEarState):
     pass
+
+
+class WaitingForPass(WhisperingEarState):
+    pass
+
+
+class Opened(WhisperingEarState):
+    pass
+
+
+class RejectedPass(WhisperingEarState):
+    pass

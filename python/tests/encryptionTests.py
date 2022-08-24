@@ -1,6 +1,6 @@
 import unittest
 
-from encryption.unsafeEncryption import UnsafeEncryption
+from python.encryption.unsafeEncryption import UnsafeEncryption
 
 
 class EncryptionTestCase(unittest.TestCase):

@@ -1,9 +1,9 @@
 import time
 import unittest
 
-from talker.talkerInterfaceIdentity import TalkerInterfaceIdentity
-from tests.testSuite import TestSuite
-from whisper.whisperingMouth import WhisperingMouth
+from python.talker.talkerInterfaceIdentity import TalkerInterfaceIdentity
+from python.tests.testSuite import TestSuite
+from python.whisper.whisperingMouth import WhisperingMouth
 
 
 class WhisperTestCase(unittest.TestCase):

@@ -7,5 +7,5 @@ class MediumKind(Enum):
 
 
 class Medium:
-    def onWhisper(self, handler: Callable[[str], None]):
-        pass
+    def send(self, message: bytes):
+        raise Exception('dont use this base class Medium.send(bytes)')

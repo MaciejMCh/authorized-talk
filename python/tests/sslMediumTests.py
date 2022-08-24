@@ -1,15 +1,13 @@
-import asyncio
 import time
 import unittest
-from medium.sslMedium import SslMedium
+from python.medium.sslMedium import SslMedium
 
 
 class SslMediumTestCase(unittest.TestCase):
     def testSendMessageAsClient(self):
-        result = ''
+        result = b''
         anna = SslMedium.local(8765)
         bob = SslMedium.local(8766)
-        time.sleep(1.2)
 
         annaSession = anna.connectTo(bob.url())
 
@@ -17,13 +15,13 @@ class SslMediumTestCase(unittest.TestCase):
             nonlocal result
             result = message
 
-        time.sleep(1.2)
         bob.incomingSessions[0].onMessage(handleIncomingMessageAsBob)
-        annaSession.send('hello')
-        time.sleep(.2)
+        annaSession.send(b'hello')
+        time.sleep(0.3)
 
-        self.assertEqual('hello', result)
+        self.assertEqual(b'hello', result)
         annaSession.close()
+        bob.incomingSessions[0].close()
 
     def testSendMessageAsServer(self):
         result = ''

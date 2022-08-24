@@ -1,13 +1,13 @@
 import os
-from blockchain import Blockchain
-from encryption.unsafeEncryption import UnsafeEncryption
-from meTalker import MeTalker
-from medium.sslMedium import SslMedium
-from talker.talkerIdentity import TalkerIdentity
+from python.blockchain import Blockchain
+from python.encryption.unsafeEncryption import UnsafeEncryption
+from python.meTalker import MeTalker
+from python.medium.sslMedium import SslMedium
+from python.talker.talkerIdentity import TalkerIdentity
 
 
 def makeGanacheBlockchain():
-    return Blockchain('http://127.0.0.1:7545')
+    return Blockchain('http://127.0.0.1:8545')
 
 
 def smartContractSolFilePath():

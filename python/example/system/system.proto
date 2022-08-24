@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+// Core
+message Actor {}
+message Interface {}
+message Command {}
+message Message {}
+
+// Drone
+message Drone {
+  Actor systemBase = 1;
+  TelemetryInterface telemetryInterface = 2;
+  ControllerInterface controllerInterface = 3;
+}
+
+// Drone - Telemetry
+message TelemetryInterface {
+  Interface systemBase = 1;
+  RequestTelemetryCommand requestTelemetryCommand = 2;
+  TelemetryUpdateMessage telemetryUpdateMessage = 3;
+}
+
+message RequestTelemetryCommand {
+  Command systemBase = 1;
+  float updatePeriod = 2;
+}
+
+message TelemetryUpdateMessage {
+  Message systemBase = 1;
+  float batteryLevel = 2;
+}
+
+// Drone - Controller
+message ControllerInterface {
+  Interface systemBase = 1;
+  StartCommand startCommand = 2;
+}
+
+message StartCommand {
+  Command systemBase = 1;
+}

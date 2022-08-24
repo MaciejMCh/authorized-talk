@@ -1,7 +1,6 @@
 import asyncio
 from threading import Thread
-
-from medium.session import Session
+from python.medium.session import Session
 
 
 class SslSession(Session):
@@ -23,4 +22,6 @@ class SslSession(Session):
         thread.start()
 
     def close(self):
-        self.websocket.close()
+        async def do():
+            await self.websocket.close()
+        asyncio.run(do())

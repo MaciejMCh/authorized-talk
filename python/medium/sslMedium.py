@@ -1,10 +1,10 @@
 import asyncio
 from threading import Thread, Lock
 from typing import List, Callable, Optional
-from medium.medium import Medium
+from python.medium.medium import Medium
 from websockets import connect, serve
-from medium.session import Session
-from medium.sslSession import SslSession
+from python.medium.session import Session
+from python.medium.sslSession import SslSession
 
 
 class SslMedium(Medium):

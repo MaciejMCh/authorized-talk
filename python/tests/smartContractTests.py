@@ -1,6 +1,6 @@
 import unittest
 
-from tests.testSuite import makeGanacheBlockchain, smartContractSolFilePath
+from python.tests.testSuite import makeGanacheBlockchain, smartContractSolFilePath
 
 
 class SmartContractTestCase(unittest.TestCase):

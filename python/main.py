@@ -14,15 +14,15 @@ async def main():
 
     receivedMessage: Optional[bytes] = None
 
-    def handleMessageAsServer(message: bytes):
+    def handleMessageAsClient(message: bytes):
         nonlocal receivedMessage
         receivedMessage = message
 
-    server.sessions[0].onMessage = handleMessageAsServer
-    client.send(b'hi')
+    client.onMessage = handleMessageAsClient
+    await server.sessions[0].send(b'hi')
     server.close()
     await gather(server_running_task, client_running_task)
-    print('xddd', receivedMessage);
+    print(receivedMessage)
 
 if __name__ == "__main__":
     asyncio.run(main())

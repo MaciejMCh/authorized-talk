@@ -1,14 +1,40 @@
 import websockets
 from asyncio import Future, Task, create_task
-from typing import Tuple
+from typing import Tuple, List, Optional, Callable
 from python.websocket.location import Location
 
 DEBUG = True
 
 
+class WebsocketServerSession:
+    def __init__(self, websocket):
+        self.websocket = websocket
+        self.onMessage: Optional[Callable[[bytes], None]] = None
+
+    def receiveMessage(self, message: bytes):
+        if self.onMessage is None:
+            return
+        self.onMessage(message)
+
+    async def send(self, message: bytes):
+        await self.websocket.send(message)
+
+    async def close(self):
+        await self.websocket.close()
+
+
 class WebsocketServer:
-    def __init__(self, server):
+    def __init__(self):
+        self.server = None
+        self.sessions: List[WebsocketServerSession] = []
+
+    def initialize(self, server):
         self.server = server
+
+    def connectSession(self, websocket) -> WebsocketServerSession:
+        session = WebsocketServerSession(websocket)
+        self.sessions.append(session)
+        return session
 
     def close(self):
         self.server.close()
@@ -23,18 +49,21 @@ async def run(location: Location) -> Tuple[WebsocketServer, Task]:
     return server, task
 
 
-async def client_did_connect(websocket, path):
-    name = await websocket.recv()
-    greeting = f"Hello {name}!"
-
-    await websocket.send(greeting)
-    print(f">>> {greeting}")
-
-
 async def start_task(location: Location, future: Future[WebsocketServer]):
+    websocketServer = WebsocketServer()
+
+    async def client_did_connect(websocket, path):
+        debug_print('server: session connected')
+        session = websocketServer.connectSession(websocket)
+        async for message in websocket:
+            debug_print(f'server: received {message}')
+            session.receiveMessage(message)
+        await websocket.wait_closed()
+        debug_print('server: session closed')
+
     server = await websockets.serve(client_did_connect, location.host, location.port)
     debug_print('server: opened')
-    websocketServer = WebsocketServer(server)
+    websocketServer.initialize(server)
     future.set_result(websocketServer)
     await server.wait_closed()
     debug_print('server: closed')

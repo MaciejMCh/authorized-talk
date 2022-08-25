@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 from python.core.interfaceIdentity import InterfaceIdentity
 from python.medium.connector import Connector
 from python.medium.medium import Medium
@@ -21,9 +21,10 @@ class TestConnector(Connector):
 class TestMedium(Medium):
     def __init__(self, onMessage: Callable[[bytes], None]):
         self.onMessage = onMessage
+        self.sentMessages: List[bytes] = []
 
     def send(self, message: bytes):
-        pass
+        self.sentMessages.append(message)
 
     def receive(self, message: bytes):
         self.onMessage(message)

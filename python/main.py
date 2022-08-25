@@ -1,67 +1,56 @@
 import asyncio
-import signal
-import threading
-import time
-from asyncio import Event, Future
-from collections import Callable
-from threading import Thread
-from typing import Optional
-
 import websockets
 
-from encryption.unsafeEncryption import UnsafeEncryption
-from python.medium.sslMedium import SslMedium
-from talker.talkerInterfaceIdentity import TalkerInterfaceIdentity
-from tests.testSuite import TestSuite
-from whisper.whisperingMouth import WhisperingMouth
 
-
-class WebsocketClient:
-    def __init__(self):
-        self.connectToServer()
-
-    def connectToServer(self):
-        async def runAsync():
-            uri = "ws://localhost:8765"
-            print('client: will connect')
-            async with websockets.connect(uri) as websocket:
-                print('client: connected', websocket)
-                await websocket.send('xdd')
-        asyncio.run(runAsync())
-
-
-class WebsocketServer:
+class Controller:
     def __init__(self):
         self.server = None
-        self.stop: Optional[Future] = None
-        self.startServer()
-
-    def startServer(self):
-        print('server: start')
-
-        def runServerThread():
-            async def runAsync():
-                async def hello(websocket, path):
-                    print(f'server: connected')
-
-                self.stop = asyncio.Future()
-                self.server = await websockets.serve(hello, "localhost", 8765)
-                await self.stop
-            asyncio.run(runAsync())
-
-        Thread(target=runServerThread).start()
-
-    def close(self):
-        self.stop.get_loop().call_soon_threadsafe(self.stop.set_result, None)
 
 
-def main():
-    server = WebsocketServer()
-    time.sleep(0.5)
-    client = WebsocketClient()
-    time.sleep(0.5)
-    server.close()
+async def hello(websocket, path):
+    print(f'server: connected {websocket}')
+    name = await websocket.recv()
+    print(f"<<< {name}")
+
+    greeting = f"Hello {name}!"
+
+    await websocket.send(greeting)
+    print(f">>> {greeting}")
 
 
-if __name__ == '__main__':
-    main()
+async def runServer(controller: Controller):
+    print('server: starting')
+    server = await websockets.serve(hello, "localhost", 8765)
+    controller.server = server
+    print(f'server: started {server}')
+    await server.wait_closed()
+    print('server: closed')
+
+
+async def client():
+    print('client: starting')
+    uri = "ws://localhost:8765"
+    async with websockets.connect(uri) as websocket:
+        name = 'name'
+        await websocket.send(name)
+        greeting = await websocket.recv()
+    print('client: closed')
+
+
+async def runController(controller: Controller):
+    await asyncio.sleep(2)
+    print(print('controller.server', controller.server))
+    controller.server.close()
+
+
+async def main():
+    controller = Controller()
+    await asyncio.gather(
+        runServer(controller),
+        client(),
+        runController(controller),
+    )
+    print('main closed')
+
+if __name__ == "__main__":
+    asyncio.run(main())

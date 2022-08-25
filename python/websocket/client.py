@@ -10,6 +10,9 @@ class WebsocketClient:
     def __init__(self, websocket):
         self.websocket = websocket
 
+    async def close(self):
+        await self.websocket.close()
+
 
 async def run(location: Location) -> Tuple[WebsocketClient, Task]:
     debug_print('client: will run')
@@ -28,15 +31,6 @@ async def start_task(location: Location, future: Future[WebsocketClient]):
     future.set_result(websocket_client)
     await websocket.wait_closed()
     debug_print('client: closed')
-
-# async def run(location: Location) -> Tuple[WebsocketClient, Task]:
-#     debug_print('client: will run')
-#     uri = f'ws://{location.host}:{location.port}'
-#     websocket = await websockets.connect(uri)
-#     debug_print('client: connected')
-#     await websocket.wait_closed()
-#     debug_print('client: closed')
-#     return None, None
 
 
 def debug_print(msg: str):

@@ -40,7 +40,7 @@ class WebsocketServer:
         self.server.close()
 
 
-async def run(location: Location) -> Tuple[WebsocketServer, Task]:
+async def run_server(location: Location) -> Tuple[WebsocketServer, Task]:
     debug_print('server: will run')
     future: Future[WebsocketServer] = Future()
     task = create_task(start_task(location=location, future=future))

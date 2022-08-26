@@ -3,8 +3,8 @@ from asyncio import gather
 from typing import Optional
 
 from python.websocket.location import Location
-from python.websocket.server import run as run_server
-from python.websocket.client import run as run_client
+from python.websocket.server import run_server
+from python.websocket.client import run_client
 
 
 class WebsocketsTestCase(unittest.TestCase):

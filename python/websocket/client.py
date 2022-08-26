@@ -23,7 +23,7 @@ class WebsocketClient:
         self.onMessage(message)
 
 
-async def run(location: Location) -> Tuple[WebsocketClient, Task]:
+async def run_client(location: Location) -> Tuple[WebsocketClient, Task]:
     debug_print('client: will run')
     future: Future[WebsocketClient] = Future()
     task = create_task(start_task(location=location, future=future))

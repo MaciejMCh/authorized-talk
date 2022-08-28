@@ -3,10 +3,15 @@ from enum import Enum
 from typing import List, Optional
 from python.connector.authorized_connector import AuthorizedConnector
 from python.core.interface_identity import InterfaceIdentity
+from python.core.rsa_keys import RsaKeys
 from python.encryption.encryption import Encryption
+from python.encryption.rsa_encryption import RsaEncryption
 from python.identity_server.identity_server import IdentityServer
+from python.medium.authorized.utils import introduction_signature
 from python.medium.kinds import SourceMedium
 from python.medium.medium import Medium
+from python.messages.whisper_control_pb2 import Introduction
+from python.tests.utils import bob_private_key
 
 
 class Status(Enum):
@@ -22,11 +27,14 @@ class AuthorizedClientMedium(Medium):
             target: InterfaceIdentity,
             identity_server: IdentityServer,
             available_source_mediums: List[SourceMedium],
+            rsa_keys: RsaKeys,
     ):
         super().__init__()
         self.status = Status.INITIAL
         self.identity_server = identity_server
+        self.rsa_keys = rsa_keys
         self.medium: Optional[Medium] = None
+        self.target_public_key: Optional[bytes] = None
         self.introducing = get_running_loop().create_future()
 
         self.connected = create_task(self.connect(
@@ -47,9 +55,23 @@ class AuthorizedClientMedium(Medium):
         create_task(self.introduce(target))
 
     async def introduce(self, target: InterfaceIdentity):
-        target_public_key = await self.identity_server.get_public_key(target.pseudonym)
-        Encryption.codeWithPublicKey()
-        await self.medium.send(b'hi')
+        self.target_public_key = await self.identity_server.get_public_key(target.pseudonym)
+        signature = RsaEncryption.sign(
+            message=introduction_signature(pseudonym=target.pseudonym, targetInterface=target.interface),
+            private_key=self.rsa_keys.private_key,
+        )
+        print('degg', signature)
+        introduction = Introduction(
+            pseudonym=target.pseudonym,
+            targetInterface=target.interface,
+            signature=signature,
+        )
+        cipher = RsaEncryption.encrypt(
+            message=introduction.SerializeToString(),
+            public_key=self.target_public_key,
+        )
+
+        await self.medium.send(cipher)
         self.status = Status.INTRODUCING
         self.introducing.set_result(None)
 

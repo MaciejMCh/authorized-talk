@@ -1,1 +1,1 @@
-protoc -I=. --python_out=../python/messages ./whisperControl.proto
+protoc -I=. --python_out=../python/messages ./whisper_control.proto

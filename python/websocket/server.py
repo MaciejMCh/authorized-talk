@@ -9,12 +9,15 @@ DEBUG = True
 class WebsocketServerSession:
     def __init__(self, websocket):
         self.websocket = websocket
-        self.onMessage: Optional[Callable[[bytes], None]] = None
+        self.on_message: Optional[Callable[[bytes], None]] = None
 
-    def receiveMessage(self, message: bytes):
-        if self.onMessage is None:
+    def handle_message(self, handler: Callable[[bytes], None]):
+        self.on_message = handler
+
+    def receive_message(self, message: bytes):
+        if self.on_message is None:
             return
-        self.onMessage(message)
+        self.on_message(message)
 
     async def send(self, message: bytes):
         await self.websocket.send(message)
@@ -57,7 +60,7 @@ async def start_task(location: Location, future: Future[WebsocketServer]):
         session = websocketServer.connectSession(websocket)
         async for message in websocket:
             debug_print(f'server: received {message}')
-            session.receiveMessage(message)
+            session.receive_message(message)
         await websocket.wait_closed()
         debug_print('server: session closed')
 

@@ -9,7 +9,7 @@ DEBUG = True
 class WebsocketClient:
     def __init__(self, websocket):
         self.websocket = websocket
-        self.onMessage: Optional[Callable[[bytes], None]] = None
+        self.on_message: Optional[Callable[[bytes], None]] = None
 
     async def close(self):
         await self.websocket.close()
@@ -17,10 +17,13 @@ class WebsocketClient:
     async def send(self, message: bytes):
         await self.websocket.send(message)
 
-    def receiveMessage(self, message: bytes):
-        if self.onMessage is None:
+    def receive_message(self, message: bytes):
+        if self.on_message is None:
             return
-        self.onMessage(message)
+        self.on_message(message)
+
+    def handle_message(self, handler: Callable[[bytes], None]):
+        self.on_message = handler
 
 
 async def run_client(location: Location) -> Tuple[WebsocketClient, Task]:
@@ -40,7 +43,7 @@ async def start_task(location: Location, future: Future[WebsocketClient]):
     future.set_result(websocket_client)
 
     async for message in websocket:
-        websocket_client.receiveMessage(message)
+        websocket_client.receive_message(message)
         debug_print(f'client: received {message}')
 
     await websocket.wait_closed()

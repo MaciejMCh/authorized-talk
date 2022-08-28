@@ -23,7 +23,7 @@ class RsaEncryption:
         return rsa.sign(message, cls.private_key_with_bytes(private_key), HASH_METHOD)
 
     @classmethod
-    def verify(cls, message: bytes, signature: bytes, public_key: bytes) -> bytes:
+    def verify(cls, message: bytes, signature: bytes, public_key: bytes) -> bool:
         result = rsa.verify(message, signature, cls.public_key_with_bytes(public_key))
         return result == HASH_METHOD
 

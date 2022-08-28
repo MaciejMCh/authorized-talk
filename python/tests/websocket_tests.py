@@ -54,7 +54,7 @@ class WebsocketsTestCase(unittest.IsolatedAsyncioTestCase):
             nonlocal receivedMessage
             receivedMessage = message
 
-        server.sessions[0].onMessage = handleMessageAsServer
+        server.sessions[0].handle_message(handleMessageAsServer)
         await client.send(b'hi')
         server.close()
         await gather(server_running_task, client_running_task)
@@ -71,7 +71,7 @@ class WebsocketsTestCase(unittest.IsolatedAsyncioTestCase):
             nonlocal receivedMessage
             receivedMessage = message
 
-        client.onMessage = handleMessageAsClient
+        client.handle_message(handleMessageAsClient)
         await server.sessions[0].send(b'hi')
         server.close()
         await gather(server_running_task, client_running_task)

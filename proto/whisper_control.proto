@@ -3,9 +3,9 @@ syntax = "proto3";
 message Introduction {
   string pseudonym = 1;
   string targetInterface = 2;
-  string signature = 3;
+  bytes signature = 3;
 }
 
 message AccessPass {
-	string signature = 1;
+	bytes signature = 1;
 }

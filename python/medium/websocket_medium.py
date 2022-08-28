@@ -7,12 +7,12 @@ class WebsocketMedium(Medium):
     def __init__(self, websocket_client: WebsocketClient):
         super().__init__()
         self.websocket_client = websocket_client
-        self.websocket_client.onMessage = self.handleMessage
+        self.websocket_client.handle_message(self.handle_websocket_message)
 
     async def send(self, message: bytes):
         await self.websocket_client.send(message)
 
-    def handleMessage(self, message: bytes):
+    def handle_websocket_message(self, message: bytes):
         if self.on_message is None:
             return
         self.on_message(message)

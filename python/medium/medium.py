@@ -17,3 +17,6 @@ class Medium:
         if self.on_message is None:
             return
         self.on_message(message)
+
+    def handle_message(self, handler: Callable[[bytes], None]):
+        self.on_message = handler

@@ -11,17 +11,17 @@ class WebsocketMediumTestCase(unittest.IsolatedAsyncioTestCase):
         location = Location(host='localhost', port=8765)
         server, server_running_task = await run_server(location=location)
         medium = await WebsocketConnector.establish_connection(Location(host='localhost', port=8765))
-        receivedMessage: Optional[bytes] = None
+        received_message: Optional[bytes] = None
 
-        def receiveMessageAsServer(message: bytes):
-            nonlocal receivedMessage
-            receivedMessage = message
+        def receive_message_as_server(message: bytes):
+            nonlocal received_message
+            received_message = message
 
-        server.sessions[0].onMessage = receiveMessageAsServer
+        server.sessions[0].handle_message(receive_message_as_server)
         await medium.send(b'hi')
         server.close()
         await server_running_task
-        self.assertEqual(receivedMessage, b'hi', 'hi message should be received')
+        self.assertEqual(received_message, b'hi', 'hi message should be received')
 
     async def test_receive_message(self):
         location = Location(host='localhost', port=8765)
@@ -33,7 +33,7 @@ class WebsocketMediumTestCase(unittest.IsolatedAsyncioTestCase):
             nonlocal receivedMessage
             receivedMessage = message
 
-        medium.onMessage = receiveMessageAsMedium
+        medium.handle_message(receiveMessageAsMedium)
         await server.sessions[0].send(b'hi')
         server.close()
         await server_running_task

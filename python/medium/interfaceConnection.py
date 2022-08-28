@@ -2,8 +2,9 @@ from typing import Callable, Tuple, List
 from google.protobuf.message import Message
 from google.protobuf.internal.python_message import GeneratedProtocolMessageType
 from google.protobuf.descriptor import Descriptor, FieldDescriptor
+
+from python.connector.connector import Connector
 from python.core.interface_identity import InterfaceIdentity
-from python.medium.connector import Connector
 
 
 class InterfaceConnection:
@@ -11,12 +12,12 @@ class InterfaceConnection:
             self,
             interfaceDeclaration: GeneratedProtocolMessageType,
             interfaceIdentity: InterfaceIdentity,
-            onMessage: Callable[[bytes], None],
+            on_message: Callable[[bytes], None],
             connector: Connector,
      ):
         self.medium = connector.establish_connection(
             interface_identity=interfaceIdentity,
-            on_message=onMessage,
+            on_message=on_message,
         )
         self.commandsTypesWhiteList = makeCommandsTypesWhiteList(interfaceDeclaration)
 

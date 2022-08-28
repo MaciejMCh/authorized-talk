@@ -3,6 +3,7 @@ from enum import Enum
 from typing import List, Optional
 from python.connector.authorized_connector import AuthorizedConnector
 from python.core.interface_identity import InterfaceIdentity
+from python.encryption.encryption import Encryption
 from python.identity_server.identity_server import IdentityServer
 from python.medium.kinds import SourceMedium
 from python.medium.medium import Medium
@@ -43,9 +44,11 @@ class AuthorizedClientMedium(Medium):
             available_source_mediums=available_source_mediums,
         ).establish_connection(target, self.receive_message)
         self.status = Status.CONNECTED
-        create_task(self.introduce())
+        create_task(self.introduce(target))
 
-    async def introduce(self):
+    async def introduce(self, target: InterfaceIdentity):
+        target_public_key = await self.identity_server.get_public_key(target.pseudonym)
+        Encryption.codeWithPublicKey()
         await self.medium.send(b'hi')
         self.status = Status.INTRODUCING
         self.introducing.set_result(None)

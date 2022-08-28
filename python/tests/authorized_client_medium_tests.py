@@ -3,7 +3,7 @@ from typing import Optional
 from python.core.interface_identity import InterfaceIdentity
 from python.medium.authorized_medium import AuthorizedClientMedium, Status
 from python.medium.kinds import WebsocketSourceMedium, WebsocketTargetMedium
-from python.tests.utils import TestIdentityServer
+from python.tests.utils import TestIdentityServer, bob_public_key
 from python.websocket.location import Location
 from python.websocket.server import run_server
 
@@ -49,7 +49,10 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
 
         medium = AuthorizedClientMedium(
             target=InterfaceIdentity(pseudonym='bob', interface='some_interface'),
-            identity_server=TestIdentityServer({'bob': [WebsocketTargetMedium(location=bob_websocket_location)]}),
+            identity_server=TestIdentityServer(
+                target_mediums_by_pseudonyms={'bob': [WebsocketTargetMedium(location=bob_websocket_location)]},
+                public_keys_by_pseudonyms={'bob': bob_public_key},
+            ),
             available_source_mediums=[WebsocketSourceMedium()],
         )
         await medium.introducing
@@ -61,7 +64,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
 
         server.sessions[0].onMessage = receive_message
         self.assertEqual(medium.status, Status.INTRODUCING, 'introducing status should be Status.INTRODUCING')
-        self.assertIsNone(received_message, 'message should be received')
+        self.assertEqual('xddd', received_message)
 
         server.close()
         await server_close
@@ -71,5 +74,6 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
 # TODO: each state must reject invalid signatures
 # TODO: each state must reject not expected messages
 
+# TODO: introduction checks: bob has access
 if __name__ == '__main__':
     unittest.main()

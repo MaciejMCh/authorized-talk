@@ -4,6 +4,7 @@ from typing import Optional
 from python.core.interface_identity import InterfaceIdentity
 from python.encryption.rsa_encryption import RsaEncryption
 from python.medium.authorized.client import AuthorizedClientMedium, Status
+from python.medium.authorized.utils import introduction_signature
 from python.medium.kinds import WebsocketSourceMedium, WebsocketTargetMedium
 from python.messages.whisper_control_pb2 import Introduction
 from python.tests.utils import TestIdentityServer, bob_public_key, alice_rsa_keys, bob_private_key
@@ -88,6 +89,11 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         introduction.ParseFromString(decrypted_message)
         self.assertEqual(introduction.pseudonym, 'bob')
         self.assertEqual(introduction.targetInterface, 'some_interface')
+        self.assertTrue(RsaEncryption.verify(
+            message=b'$bob;$some_interface',
+            signature=introduction.signature,
+            public_key=alice_rsa_keys.public_key,
+        ))
 
         server.close()
         await server_close

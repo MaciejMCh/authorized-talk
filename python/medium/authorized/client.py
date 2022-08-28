@@ -35,9 +35,10 @@ class AuthorizedClientMedium(Medium):
         self.rsa_keys = rsa_keys
         self.medium: Optional[Medium] = None
         self.target_public_key: Optional[bytes] = None
+        self.connected = get_running_loop().create_future()
         self.introducing = get_running_loop().create_future()
 
-        self.connected = create_task(self.connect(
+        create_task(self.connect(
             target=target,
             available_source_mediums=available_source_mediums,
         ))
@@ -52,6 +53,7 @@ class AuthorizedClientMedium(Medium):
             available_source_mediums=available_source_mediums,
         ).establish_connection(target, self.receive_message)
         self.status = Status.CONNECTED
+        self.connected.set_result(None)
         create_task(self.introduce(target))
 
     async def introduce(self, target: InterfaceIdentity):

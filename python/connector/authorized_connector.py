@@ -17,7 +17,7 @@ class AuthorizedConnector(Connector):
             interface_identity: InterfaceIdentity,
             on_message: Callable[[bytes], None],
     ) -> Medium:
-        available_target_mediums = self.identity_server.get_available_mediums(interface_identity.pseudonym)
+        available_target_mediums = await self.identity_server.get_available_mediums(interface_identity.pseudonym)
         return await CompromiseConnector(
             targets=available_target_mediums,
             sources=self.available_source_mediums,

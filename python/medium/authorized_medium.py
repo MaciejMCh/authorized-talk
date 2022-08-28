@@ -13,8 +13,12 @@ class Status(Enum):
 
 
 class AuthorizedClientMedium(Medium):
-    def __init__(self, identity_server: IdentityServer, target: InterfaceIdentity,
-                 available_source_mediums: List[SourceMedium]):
+    def __init__(
+            self,
+            target: InterfaceIdentity,
+            identity_server: IdentityServer,
+            available_source_mediums: List[SourceMedium],
+    ):
         super().__init__()
         self.status = Status.INITIAL
         self.identity_server = identity_server

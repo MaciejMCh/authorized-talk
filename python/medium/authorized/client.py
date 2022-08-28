@@ -62,7 +62,6 @@ class AuthorizedClientMedium(Medium):
             message=introduction_signature(pseudonym=target.pseudonym, targetInterface=target.interface),
             private_key=self.rsa_keys.private_key,
         )
-        print('degg', signature)
         introduction = Introduction(
             pseudonym=target.pseudonym,
             targetInterface=target.interface,

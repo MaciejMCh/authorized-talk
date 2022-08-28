@@ -21,7 +21,7 @@ class WebsocketMediumTestCase(unittest.IsolatedAsyncioTestCase):
         await medium.send(b'hi')
         server.close()
         await server_running_task
-        self.assertEqual(receivedMessage, b'hi')
+        self.assertEqual(receivedMessage, b'hi', 'hi message should be received')
 
     async def test_receive_message(self):
         location = Location(host='localhost', port=8765)
@@ -37,7 +37,7 @@ class WebsocketMediumTestCase(unittest.IsolatedAsyncioTestCase):
         await server.sessions[0].send(b'hi')
         server.close()
         await server_running_task
-        self.assertEqual(receivedMessage, b'hi')
+        self.assertEqual(receivedMessage, b'hi', 'hi message should be received')
 
 
 if __name__ == '__main__':

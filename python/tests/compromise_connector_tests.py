@@ -1,7 +1,7 @@
 import unittest
 
+from python.connector.compromise_connector import CompromiseConnector, FailedToResolveMedium
 from python.core.interface_identity import InterfaceIdentity
-from python.medium.compromise_connector import CompromiseConnector, FailedToResolveMedium
 from python.medium.kinds import WebsocketTargetMedium, WebsocketSourceMedium
 from python.websocket.location import Location
 from python.websocket.server import run_server
@@ -21,9 +21,9 @@ class CompromiseConnectorTestCase(unittest.IsolatedAsyncioTestCase):
                 ),
                 on_message=lambda x: x,
             )
-            self.assertIsNone(medium)
+            self.assertIsNone(medium, 'should not establish medium, but raise exception instead')
         except FailedToResolveMedium as exception:
-            self.assertIsNotNone(exception)
+            self.assertIsNotNone(exception, 'should raise failed to resolve medium exception')
 
     async def test_compromise_not_found_when_none_targets(self):
         connector = CompromiseConnector(
@@ -38,9 +38,9 @@ class CompromiseConnectorTestCase(unittest.IsolatedAsyncioTestCase):
                 ),
                 on_message=lambda x: x,
             )
-            self.assertIsNone(medium)
+            self.assertIsNone(medium, 'should not establish medium, but raise exception instead')
         except FailedToResolveMedium as exception:
-            self.assertIsNotNone(exception)
+            self.assertIsNotNone(exception, 'should raise failed to resolve medium exception')
 
     async def test_websocket_compromise(self):
         location = Location(host='localhost', port=8765)
@@ -57,7 +57,7 @@ class CompromiseConnectorTestCase(unittest.IsolatedAsyncioTestCase):
             ),
             on_message=lambda x: x,
         )
-        self.assertIsNotNone(medium)
+        self.assertIsNotNone(medium, 'should establish websocket medium')
         server.close()
         await server_close_task
 

@@ -1,6 +1,6 @@
 from typing import List, Callable
+from python.connector.connector import Connector
 from python.core.interface_identity import InterfaceIdentity
-from python.medium.connector import Connector
 from python.medium.medium import Medium
 from python.medium.websocket_medium import WebsocketConnector
 from python.medium.kinds import SourceMedium, TargetMedium, WebsocketTargetMedium

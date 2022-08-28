@@ -2,7 +2,7 @@ from typing import Callable, Tuple, List
 from google.protobuf.message import Message
 from google.protobuf.internal.python_message import GeneratedProtocolMessageType
 from google.protobuf.descriptor import Descriptor, FieldDescriptor
-from python.core.interfaceIdentity import InterfaceIdentity
+from python.core.interface_identity import InterfaceIdentity
 from python.medium.connector import Connector
 
 

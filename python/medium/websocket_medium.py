@@ -13,9 +13,9 @@ class WebsocketMedium(Medium):
         await self.websocket_client.send(message)
 
     def handleMessage(self, message: bytes):
-        if self.onMessage is None:
+        if self.on_message is None:
             return
-        self.onMessage(message)
+        self.on_message(message)
 
 
 class WebsocketConnector:

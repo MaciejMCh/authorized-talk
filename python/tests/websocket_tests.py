@@ -7,7 +7,7 @@ from python.websocket.server import run_server
 from python.websocket.client import run_client
 
 
-class WebsocketsTestCase(unittest.TestCase):
+class WebsocketsTestCase(unittest.IsolatedAsyncioTestCase):
     async def test_open_and_close_server(self):
         location = Location(host='localhost', port=8765)
         server, server_running_task = await run_server(location=location)

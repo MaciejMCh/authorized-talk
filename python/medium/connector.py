@@ -1,12 +1,12 @@
 from collections import Callable
-from python.core.interfaceIdentity import InterfaceIdentity
+from python.core.interface_identity import InterfaceIdentity
 from python.medium.medium import Medium
 
 
 class Connector:
-    def establishConnection(
+    async def establish_connection(
             self,
-            interfaceIdentity: InterfaceIdentity,
-            onMessage: Callable[[bytes], None],
+            interface_identity: InterfaceIdentity,
+            on_message: Callable[[bytes], None],
     ) -> Medium:
         raise Exception('dont use this base class')

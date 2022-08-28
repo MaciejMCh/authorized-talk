@@ -9,12 +9,12 @@ class TestConnector(Connector):
     def __init__(self):
         self.testMedium: Optional[TestMedium] = None
 
-    def establishConnection(
+    def establish_connection(
             self,
-            interfaceIdentity: InterfaceIdentity,
-            onMessage: Callable[[bytes], None],
+            interface_identity: InterfaceIdentity,
+            on_message: Callable[[bytes], None],
     ) -> Medium:
-        testMedium = TestMedium(onMessage)
+        testMedium = TestMedium(on_message)
         self.testMedium = testMedium
         return testMedium
 

@@ -14,9 +14,9 @@ class InterfaceConnection:
             onMessage: Callable[[bytes], None],
             connector: Connector,
      ):
-        self.medium = connector.establishConnection(
-            interfaceIdentity=interfaceIdentity,
-            onMessage=onMessage,
+        self.medium = connector.establish_connection(
+            interface_identity=interfaceIdentity,
+            on_message=onMessage,
         )
         self.commandsTypesWhiteList = makeCommandsTypesWhiteList(interfaceDeclaration)
 

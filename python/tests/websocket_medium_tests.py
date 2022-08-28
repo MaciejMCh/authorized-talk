@@ -6,7 +6,7 @@ from python.websocket.location import Location
 from python.websocket.server import run_server
 
 
-class WebsocketMediumTestCase(unittest.TestCase):
+class WebsocketMediumTestCase(unittest.IsolatedAsyncioTestCase):
     async def test_send_message(self):
         location = Location(host='localhost', port=8765)
         server, server_running_task = await run_server(location=location)

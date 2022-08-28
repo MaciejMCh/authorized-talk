@@ -44,7 +44,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
 
         medium.on_message = receive_message
         await server.sessions[0].send(b'hi')
-        self.assertEqual(medium.status, Status.INITIAL, 'initial status should be Status.INITIAL')
+        self.assertEqual(medium.status, Status.CONNECTED, 'connected status should be Status.CONNECTED')
         self.assertIsNone(received_message, 'message should not be received')
 
         server.close()

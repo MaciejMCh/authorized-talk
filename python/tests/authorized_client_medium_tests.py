@@ -18,6 +18,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         server, server_close = await run_server(bob_websocket_location)
 
         medium = AuthorizedClientMedium(
+            pseudonym='alice',
             target=InterfaceIdentity(pseudonym='bob', interface='some_interface'),
             identity_server=TestIdentityServer(
                 target_mediums_by_pseudonyms={'bob': [WebsocketTargetMedium(location=bob_websocket_location)]},
@@ -38,6 +39,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         server, server_close = await run_server(bob_websocket_location)
 
         medium = AuthorizedClientMedium(
+            pseudonym='alice',
             target=InterfaceIdentity(pseudonym='bob', interface='some_interface'),
             identity_server=TestIdentityServer(
                 target_mediums_by_pseudonyms={'bob': [WebsocketTargetMedium(location=bob_websocket_location)]},
@@ -60,6 +62,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         server, server_close = await run_server(bob_websocket_location)
 
         medium = AuthorizedClientMedium(
+            pseudonym='alice',
             target=InterfaceIdentity(pseudonym='bob', interface='some_interface'),
             identity_server=TestIdentityServer(
                 target_mediums_by_pseudonyms={'bob': [WebsocketTargetMedium(location=bob_websocket_location)]},
@@ -87,10 +90,10 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         decrypted_message = RsaEncryption.decrypt(cipher=received_message, private_key=bob_private_key)
         introduction = Introduction()
         introduction.ParseFromString(decrypted_message)
-        self.assertEqual(introduction.pseudonym, 'bob')
+        self.assertEqual(introduction.pseudonym, 'alice')
         self.assertEqual(introduction.targetInterface, 'some_interface')
         self.assertTrue(RsaEncryption.verify(
-            message=b'$bob;$some_interface',
+            message=b'$alice;$some_interface',
             signature=introduction.signature,
             public_key=alice_rsa_keys.public_key,
         ))

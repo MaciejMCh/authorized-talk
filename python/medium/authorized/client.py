@@ -24,12 +24,14 @@ class Status(Enum):
 class AuthorizedClientMedium(Medium):
     def __init__(
             self,
+            pseudonym: str,
             target: InterfaceIdentity,
             identity_server: IdentityServer,
             available_source_mediums: List[SourceMedium],
             rsa_keys: RsaKeys,
     ):
         super().__init__()
+        self.pseudonym = pseudonym
         self.status = Status.INITIAL
         self.identity_server = identity_server
         self.rsa_keys = rsa_keys
@@ -59,11 +61,11 @@ class AuthorizedClientMedium(Medium):
     async def introduce(self, target: InterfaceIdentity):
         self.target_public_key = await self.identity_server.get_public_key(target.pseudonym)
         signature = RsaEncryption.sign(
-            message=introduction_signature(pseudonym=target.pseudonym, targetInterface=target.interface),
+            message=introduction_signature(pseudonym=self.pseudonym, targetInterface=target.interface),
             private_key=self.rsa_keys.private_key,
         )
         introduction = Introduction(
-            pseudonym=target.pseudonym,
+            pseudonym=self.pseudonym,
             targetInterface=target.interface,
             signature=signature,
         )

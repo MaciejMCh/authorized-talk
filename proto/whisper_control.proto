@@ -18,4 +18,5 @@ message ChallengeAnswer {
 
 message AccessPass {
 	bytes signature = 1;
+	bool passes = 2;
 }

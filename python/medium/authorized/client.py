@@ -8,10 +8,10 @@ from python.core.rsa_keys import RsaKeys
 from python.encryption.encryption import Encryption
 from python.encryption.rsa_encryption import RsaEncryption
 from python.identity_server.identity_server import IdentityServer
-from python.medium.authorized.utils import introduction_signature
+from python.medium.authorized.utils import introduction_signature, access_pass_signature
 from python.medium.kinds import SourceMedium
 from python.medium.medium import Medium
-from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer
+from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer, AccessPass
 
 
 class Status(Enum):
@@ -20,8 +20,9 @@ class Status(Enum):
     INTRODUCING = 3
     CHALLENGED = 4
     FAILED_TO_AUTHORIZE = 5
-    ANSWERED = 6
-    AUTHORIZED = 7
+    SUBMITTED = 6
+    ANSWERED = 7
+    AUTHORIZED = 8
 
 
 class AuthorizedClientMedium(Medium):
@@ -47,6 +48,7 @@ class AuthorizedClientMedium(Medium):
         self.introducing = get_running_loop().create_future()
         self.challenged = get_running_loop().create_future()
         self.submitted = get_running_loop().create_future()
+        self.authorized = get_running_loop().create_future()
 
         create_task(self.connect(
             target=target,
@@ -98,8 +100,34 @@ class AuthorizedClientMedium(Medium):
         if self.status == Status.INTRODUCING:
             self.receive_challenge(message)
             return
+        if self.status == Status.SUBMITTED:
+            self.receive_access(message)
+            return
         if self.status == Status.AUTHORIZED:
             self.receive_message(message)
+            return
+
+    def receive_access(self, message: bytes):
+        decrypted = RsaEncryption.decrypt(cipher=message, private_key=self.rsa_keys.private_key)
+        access_pass = AccessPass()
+        access_pass.ParseFromString(decrypted)
+        is_verified = RsaEncryption.verify(
+            message=access_pass_signature(
+                source_pseudonym=self.pseudonym,
+                passes=access_pass.passes,
+            ),
+            signature=access_pass.signature,
+            public_key=self.target_public_key,
+        )
+
+        if is_verified:
+            if access_pass.passes:
+                self.status = Status.AUTHORIZED
+                self.authorized.set_result(None)
+            else:
+                self.fail('target rejected connection')
+        else:
+            self.fail('access pass signature not verified')
 
     def receive_challenge(self, message: bytes):
         decrypted = RsaEncryption.decrypt(cipher=message, private_key=self.rsa_keys.private_key)
@@ -127,4 +155,5 @@ class AuthorizedClientMedium(Medium):
         message = challenge_answer.SerializeToString()
         cipher = RsaEncryption.encrypt(message=message, public_key=self.target_public_key)
         await self.medium.send(cipher)
+        self.status = Status.SUBMITTED
         self.submitted.set_result(None)

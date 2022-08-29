@@ -8,7 +8,7 @@ from python.medium.authorized.client import AuthorizedClientMedium
 from python.medium.kinds import WebsocketTargetMedium, WebsocketSourceMedium
 from python.medium.medium import Medium
 from python.medium.websocket_medium import WebsocketConnector
-from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer
+from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer, AccessPass
 from python.tests.utils import TestIdentityServer, bob_public_key, alice_rsa_keys, bob_private_key, TestRandom
 from python.websocket.location import Location
 from python.websocket.server import run_server
@@ -46,27 +46,25 @@ async def main():
     challenge_bytes = challenge.SerializeToString()
     cipher = RsaEncryption.encrypt(message=challenge_bytes, public_key=alice_rsa_keys.public_key)
 
-    received_message: Optional[bytes] = None
-
-    def receive_message(message: bytes):
-        nonlocal received_message
-        received_message = message
-
-    server.sessions[0].handle_message(receive_message)
-
     await server.sessions[0].send(cipher)
     await medium.submitted
     await sleep(0.1)
 
-    self.assertIsNotNone(received_message)
-    decrypted_message = RsaEncryption.decrypt(cipher=received_message, private_key=bob_private_key)
-    challenge_answer = ChallengeAnswer()
-    challenge_answer.ParseFromString(decrypted_message)
-    self.assertTrue(RsaEncryption.verify(
-        message=b'some_otp',
-        signature=challenge_answer.signature,
+    access_pass_signature = RsaEncryption.sign(
+        message=b'alice;1',
+        private_key=bob_private_key,
+    )
+    access_pass = AccessPass(
+        signature=access_pass_signature,
+        passes=True,
+    )
+    access_pass_cipher = RsaEncryption.encrypt(
+        message=access_pass.SerializeToString(),
         public_key=alice_rsa_keys.public_key,
-    ))
+    )
+    await server.sessions[0].send(access_pass_cipher)
+    await sleep(0.1)
+    # self.assertEqual(Status.AUTHORIZED, medium.status, 'status should be Status.AUTHORIZED')
 
     server.close()
     await server_close

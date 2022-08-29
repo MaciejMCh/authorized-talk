@@ -14,12 +14,13 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15whisper_control.proto\"\\\n\x0cIntroduction\x12\x11\n\tpseudonym\x18\x01 \x01(\t\x12\x17\n\x0ftargetInterface\x18\x02 \x01(\t\x12\r\n\x05nonce\x18\x03 \x01(\t\x12\x11\n\tsignature\x18\x04 \x01(\x0c\"\x18\n\tChallenge\x12\x0b\n\x03otp\x18\x01 \x01(\t\"\x1f\n\nAccessPass\x12\x11\n\tsignature\x18\x01 \x01(\x0c\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15whisper_control.proto\"\\\n\x0cIntroduction\x12\x11\n\tpseudonym\x18\x01 \x01(\t\x12\x17\n\x0ftargetInterface\x18\x02 \x01(\t\x12\r\n\x05nonce\x18\x03 \x01(\x0c\x12\x11\n\tsignature\x18\x04 \x01(\x0c\"+\n\tChallenge\x12\x0b\n\x03otp\x18\x01 \x01(\x0c\x12\x11\n\tsignature\x18\x02 \x01(\x0c\"$\n\x0f\x43hallengeAnswer\x12\x11\n\tsignature\x18\x01 \x01(\x0c\"\x1f\n\nAccessPass\x12\x11\n\tsignature\x18\x01 \x01(\x0c\x62\x06proto3')
 
 
 
 _INTRODUCTION = DESCRIPTOR.message_types_by_name['Introduction']
 _CHALLENGE = DESCRIPTOR.message_types_by_name['Challenge']
+_CHALLENGEANSWER = DESCRIPTOR.message_types_by_name['ChallengeAnswer']
 _ACCESSPASS = DESCRIPTOR.message_types_by_name['AccessPass']
 Introduction = _reflection.GeneratedProtocolMessageType('Introduction', (_message.Message,), {
   'DESCRIPTOR' : _INTRODUCTION,
@@ -35,6 +36,13 @@ Challenge = _reflection.GeneratedProtocolMessageType('Challenge', (_message.Mess
   })
 _sym_db.RegisterMessage(Challenge)
 
+ChallengeAnswer = _reflection.GeneratedProtocolMessageType('ChallengeAnswer', (_message.Message,), {
+  'DESCRIPTOR' : _CHALLENGEANSWER,
+  '__module__' : 'whisper_control_pb2'
+  # @@protoc_insertion_point(class_scope:ChallengeAnswer)
+  })
+_sym_db.RegisterMessage(ChallengeAnswer)
+
 AccessPass = _reflection.GeneratedProtocolMessageType('AccessPass', (_message.Message,), {
   'DESCRIPTOR' : _ACCESSPASS,
   '__module__' : 'whisper_control_pb2'
@@ -48,7 +56,9 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _INTRODUCTION._serialized_start=25
   _INTRODUCTION._serialized_end=117
   _CHALLENGE._serialized_start=119
-  _CHALLENGE._serialized_end=143
-  _ACCESSPASS._serialized_start=145
-  _ACCESSPASS._serialized_end=176
+  _CHALLENGE._serialized_end=162
+  _CHALLENGEANSWER._serialized_start=164
+  _CHALLENGEANSWER._serialized_end=200
+  _ACCESSPASS._serialized_start=202
+  _ACCESSPASS._serialized_end=233
 # @@protoc_insertion_point(module_scope)

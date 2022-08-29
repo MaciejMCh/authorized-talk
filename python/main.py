@@ -8,11 +8,15 @@ from python.medium.authorized.client import AuthorizedClientMedium
 from python.medium.kinds import WebsocketTargetMedium, WebsocketSourceMedium
 from python.medium.medium import Medium
 from python.medium.websocket_medium import WebsocketConnector
-from python.messages.whisper_control_pb2 import Introduction
+from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer
 from python.tests.utils import TestIdentityServer, bob_public_key, alice_rsa_keys, bob_private_key, TestRandom
 from python.websocket.location import Location
 from python.websocket.server import run_server
 from python.websocket.client import run_client
+
+
+def assertTrue(condition: bool):
+    print('assertTrue', condition)
 
 
 async def main():
@@ -28,10 +32,19 @@ async def main():
         ),
         available_source_mediums=[WebsocketSourceMedium()],
         rsa_keys=alice_rsa_keys,
-        random=TestRandom('some_nonce'),
+        random=TestRandom(b'some_nonce'),
     )
 
-    await medium.connected
+    await medium.introducing
+    challenge = Challenge(
+        otp=b'some_otp',
+        signature=RsaEncryption.sign(
+            message=b'some_nonce',
+            private_key=bob_private_key,
+        ),
+    )
+    challenge_bytes = challenge.SerializeToString()
+    cipher = RsaEncryption.encrypt(message=challenge_bytes, public_key=alice_rsa_keys.public_key)
 
     received_message: Optional[bytes] = None
 
@@ -41,22 +54,19 @@ async def main():
 
     server.sessions[0].handle_message(receive_message)
 
-    await medium.introducing
+    await server.sessions[0].send(cipher)
+    await medium.submitted
     await sleep(0.1)
 
-    # self.assertEqual(medium.status, Status.INTRODUCING, 'introducing status should be Status.INTRODUCING')
-    # self.assertIsNotNone(received_message)
+    self.assertIsNotNone(received_message)
     decrypted_message = RsaEncryption.decrypt(cipher=received_message, private_key=bob_private_key)
-    introduction = Introduction()
-    introduction.ParseFromString(decrypted_message)
-    # self.assertEqual(introduction.pseudonym, 'alice')
-    # self.assertEqual(introduction.targetInterface, 'some_interface')
-    # self.assertEqual(introduction.nonce, 'some_nonce')
-    # self.assertTrue(RsaEncryption.verify(
-    #     message=b'$alice;$some_interface;$some_nonce',
-    #     signature=introduction.signature,
-    #     public_key=alice_rsa_keys.public_key,
-    # ))
+    challenge_answer = ChallengeAnswer()
+    challenge_answer.ParseFromString(decrypted_message)
+    self.assertTrue(RsaEncryption.verify(
+        message=b'some_otp',
+        signature=challenge_answer.signature,
+        public_key=alice_rsa_keys.public_key,
+    ))
 
     server.close()
     await server_close

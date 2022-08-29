@@ -3,12 +3,17 @@ syntax = "proto3";
 message Introduction {
   string pseudonym = 1;
   string targetInterface = 2;
-  string nonce = 3;
+  bytes nonce = 3;
   bytes signature = 4;
 }
 
 message Challenge {
-  string otp = 1;
+  bytes otp = 1;
+  bytes signature = 2;
+}
+
+message ChallengeAnswer {
+  bytes signature = 1;
 }
 
 message AccessPass {

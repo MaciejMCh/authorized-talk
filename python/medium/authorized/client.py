@@ -11,7 +11,7 @@ from python.identity_server.identity_server import IdentityServer
 from python.medium.authorized.utils import introduction_signature
 from python.medium.kinds import SourceMedium
 from python.medium.medium import Medium
-from python.messages.whisper_control_pb2 import Introduction, Challenge
+from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer
 
 
 class Status(Enum):
@@ -20,7 +20,8 @@ class Status(Enum):
     INTRODUCING = 3
     CHALLENGED = 4
     FAILED_TO_AUTHORIZE = 5
-    AUTHORIZED = 6
+    ANSWERED = 6
+    AUTHORIZED = 7
 
 
 class AuthorizedClientMedium(Medium):
@@ -44,6 +45,8 @@ class AuthorizedClientMedium(Medium):
         self.target_public_key: Optional[bytes] = None
         self.connected = get_running_loop().create_future()
         self.introducing = get_running_loop().create_future()
+        self.challenged = get_running_loop().create_future()
+        self.submitted = get_running_loop().create_future()
 
         create_task(self.connect(
             target=target,
@@ -93,12 +96,12 @@ class AuthorizedClientMedium(Medium):
 
     def receive_message(self, message: bytes):
         if self.status == Status.INTRODUCING:
-            self.receive_chellenge(message)
+            self.receive_challenge(message)
             return
         if self.status == Status.AUTHORIZED:
             self.receive_message(message)
 
-    def receive_chellenge(self, message: bytes):
+    def receive_challenge(self, message: bytes):
         decrypted = RsaEncryption.decrypt(cipher=message, private_key=self.rsa_keys.private_key)
         challenge = Challenge()
         challenge.ParseFromString(decrypted)
@@ -109,12 +112,19 @@ class AuthorizedClientMedium(Medium):
         )
 
         if is_verified:
-            self.answer_challenge()
+            create_task(self.answer_challenge(challenge=challenge))
         else:
             self.fail('invalid challenge signature')
 
     def fail(self, reason: str):
         self.status = Status.FAILED_TO_AUTHORIZE
 
-    def answer_challenge(self):
+    async def answer_challenge(self, challenge: Challenge):
         self.status = Status.CHALLENGED
+        self.challenged.set_result(None)
+        signature = RsaEncryption.sign(message=challenge.otp, private_key=self.rsa_keys.private_key)
+        challenge_answer = ChallengeAnswer(signature=signature)
+        message = challenge_answer.SerializeToString()
+        cipher = RsaEncryption.encrypt(message=message, public_key=self.target_public_key)
+        await self.medium.send(cipher)
+        self.submitted.set_result(None)

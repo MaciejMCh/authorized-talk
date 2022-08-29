@@ -29,8 +29,10 @@ class CompromiseConnector(Connector):
         for target in self.targets:
             for source in self.sources:
                 if target.kind == source.kind:
-                    return await resolve_medium(
+                    medium = await resolve_medium(
                         source=source,
                         target=target,
                     )
+                    medium.handle_message(on_message)
+                    return medium
         raise FailedToResolveMedium()

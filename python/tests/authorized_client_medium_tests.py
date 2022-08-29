@@ -4,10 +4,9 @@ from typing import Optional
 from python.core.interface_identity import InterfaceIdentity
 from python.encryption.rsa_encryption import RsaEncryption
 from python.medium.authorized.client import AuthorizedClientMedium, Status
-from python.medium.authorized.utils import introduction_signature
 from python.medium.kinds import WebsocketSourceMedium, WebsocketTargetMedium
-from python.messages.whisper_control_pb2 import Introduction
-from python.tests.utils import TestIdentityServer, bob_public_key, alice_rsa_keys, bob_private_key
+from python.messages.whisper_control_pb2 import Introduction, Challenge
+from python.tests.utils import TestIdentityServer, bob_public_key, alice_rsa_keys, bob_private_key, TestRandom
 from python.websocket.location import Location
 from python.websocket.server import run_server
 
@@ -26,6 +25,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
             ),
             available_source_mediums=[WebsocketSourceMedium()],
             rsa_keys=alice_rsa_keys,
+            random=TestRandom(b'some_nonce'),
         )
 
         self.assertEqual(medium.status, Status.INITIAL, 'initial status should be INITIAL')
@@ -47,10 +47,10 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
             ),
             available_source_mediums=[WebsocketSourceMedium()],
             rsa_keys=alice_rsa_keys,
+            random=TestRandom(b'some_nonce'),
         )
         await medium.connected
 
-        await server.sessions[0].send(b'hi')
         self.assertEqual(medium.status, Status.CONNECTED, 'connected status should be Status.CONNECTED')
         self.assertEqual(len(server.sessions), 1, 'on connected status, session should be established')
 
@@ -70,6 +70,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
             ),
             available_source_mediums=[WebsocketSourceMedium()],
             rsa_keys=alice_rsa_keys,
+            random=TestRandom(b'some_nonce'),
         )
 
         await medium.connected
@@ -92,11 +93,34 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         introduction.ParseFromString(decrypted_message)
         self.assertEqual(introduction.pseudonym, 'alice')
         self.assertEqual(introduction.targetInterface, 'some_interface')
+        self.assertEqual(introduction.nonce, 'some_nonce')
         self.assertTrue(RsaEncryption.verify(
-            message=b'$alice;$some_interface',
+            message=b'alice;some_interface;some_nonce',
             signature=introduction.signature,
             public_key=alice_rsa_keys.public_key,
         ))
+
+        server.close()
+        await server_close
+
+    async def test_challenged_status(self):
+        bob_websocket_location = Location(host='localhost', port=8765)
+        server, server_close = await run_server(bob_websocket_location)
+
+        medium = AuthorizedClientMedium(
+            pseudonym='alice',
+            target=InterfaceIdentity(pseudonym='bob', interface='some_interface'),
+            identity_server=TestIdentityServer(
+                target_mediums_by_pseudonyms={'bob': [WebsocketTargetMedium(location=bob_websocket_location)]},
+                public_keys_by_pseudonyms={'bob': bob_public_key},
+            ),
+            available_source_mediums=[WebsocketSourceMedium()],
+            rsa_keys=alice_rsa_keys,
+            random=TestRandom(b'some_nonce'),
+        )
+
+        await medium.introducing
+        await server.sessions[0].send(Challenge(otp='some_otp'))
 
         server.close()
         await server_close
@@ -107,5 +131,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
 # TODO: each state must reject not expected messages
 
 # TODO: introduction checks: bob has access
+
+# TODO: challenge checks: bob signed nonce
 if __name__ == '__main__':
     unittest.main()

@@ -69,6 +69,8 @@ class ClientSubmittingTestCase(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(medium.status, Status.FAILED, "after receiving repeated signature of negative pass, state should be failed")
         self.assertIsInstance(error, InvalidAccessPassSignature, "receiving repeated signature of negative pass should raise InvalidAccessPassSignature exception")
 
+# TODO: test repeated access pass
+
 
 if __name__ == '__main__':
     unittest.main()

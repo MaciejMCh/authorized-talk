@@ -34,7 +34,7 @@ class ClientIntroducingTestCase(unittest.IsolatedAsyncioTestCase):
         await close()
         self.assertEqual(medium.status, Status.FAILED, "after receiving invalid signature, state should be failed")
         self.assertIsInstance(error, InvalidChallengeSignature, "receiving invalid cipher, should raise InvalidChallengeSignature")
-    
+
     async def test_reject_invalid_proto_message(self):
         medium, session, close = await with_introducing_status()
         reaction = IntroductionReaction()
@@ -57,6 +57,10 @@ class ClientIntroducingTestCase(unittest.IsolatedAsyncioTestCase):
         await close()
         self.assertEqual(medium.status, Status.FAILED, "after receiving rejection, state should be failed")
         self.assertIsInstance(error, RejectedByTarget, "being rejected by target, should raise RejectedByTarget")
+
+
+# TODO: test repeated rejection
+# TODO: test repeated challenge
 
 
 if __name__ == '__main__':

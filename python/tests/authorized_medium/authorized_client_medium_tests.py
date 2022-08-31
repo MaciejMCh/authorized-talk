@@ -5,7 +5,8 @@ from python.core.interface_identity import InterfaceIdentity
 from python.encryption.rsa_encryption import RsaEncryption
 from python.medium.authorized.client import AuthorizedClientMedium, Status
 from python.medium.kinds import WebsocketSourceMedium, WebsocketTargetMedium
-from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer, AccessPass
+from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer, AccessPass, \
+    IntroductionReaction
 from python.tests.utils import TestIdentityServer, bob_public_key, alice_rsa_keys, bob_private_key, TestRandom
 from python.websocket.location import Location
 from python.websocket.server import run_server
@@ -120,15 +121,17 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         )
 
         await medium.introducing
-        challenge = Challenge(
-            otp=b'some_otp',
-            signature=RsaEncryption.sign(
-                message=b'some_nonce',
-                private_key=bob_private_key,
+        introduction_reaction = IntroductionReaction(
+            challenge = Challenge(
+                otp=b'some_otp',
+                signature=RsaEncryption.sign(
+                    message=b'some_nonce',
+                    private_key=bob_private_key,
+                ),
             ),
         )
-        challenge_bytes = challenge.SerializeToString()
-        cipher = RsaEncryption.encrypt(message=challenge_bytes, public_key=alice_rsa_keys.public_key)
+        introduction_reaction_bytes = introduction_reaction.SerializeToString()
+        cipher = RsaEncryption.encrypt(message=introduction_reaction_bytes, public_key=alice_rsa_keys.public_key)
         await server.sessions[0].send(cipher)
         await medium.challenged
         self.assertTrue(True, 'should pass challenged future')
@@ -153,15 +156,17 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         )
 
         await medium.introducing
-        challenge = Challenge(
-            otp=b'some_otp',
-            signature=RsaEncryption.sign(
-                message=b'some_nonce',
-                private_key=bob_private_key,
+        introduction_reaction = IntroductionReaction(
+            challenge=Challenge(
+                otp=b'some_otp',
+                signature=RsaEncryption.sign(
+                    message=b'some_nonce',
+                    private_key=bob_private_key,
+                ),
             ),
         )
-        challenge_bytes = challenge.SerializeToString()
-        cipher = RsaEncryption.encrypt(message=challenge_bytes, public_key=alice_rsa_keys.public_key)
+        introduction_reaction_bytes = introduction_reaction.SerializeToString()
+        cipher = RsaEncryption.encrypt(message=introduction_reaction_bytes, public_key=alice_rsa_keys.public_key)
 
         received_message: Optional[bytes] = None
 
@@ -206,15 +211,17 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         )
 
         await medium.introducing
-        challenge = Challenge(
-            otp=b'some_otp',
-            signature=RsaEncryption.sign(
-                message=b'some_nonce',
-                private_key=bob_private_key,
+        introduction_reaction = IntroductionReaction(
+            challenge=Challenge(
+                otp=b'some_otp',
+                signature=RsaEncryption.sign(
+                    message=b'some_nonce',
+                    private_key=bob_private_key,
+                ),
             ),
         )
-        challenge_bytes = challenge.SerializeToString()
-        cipher = RsaEncryption.encrypt(message=challenge_bytes, public_key=alice_rsa_keys.public_key)
+        introduction_reaction_bytes = introduction_reaction.SerializeToString()
+        cipher = RsaEncryption.encrypt(message=introduction_reaction_bytes, public_key=alice_rsa_keys.public_key)
 
         await server.sessions[0].send(cipher)
         await medium.submitted

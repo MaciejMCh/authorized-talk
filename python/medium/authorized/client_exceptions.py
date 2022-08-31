@@ -1,5 +1,6 @@
 from python.encryption.rsa_encryption import DecryptionFailed
 from python.medium.authorized.client_status import Status
+from google.protobuf.message import Message
 
 
 class ClientException(Exception):
@@ -15,3 +16,13 @@ class ReceivedInvalidCipher(ClientException):
 
 class InvalidChallengeSignature(ClientException):
     pass
+
+
+class RejectedByTarget(ClientException):
+    pass
+
+
+class MalformedProtoMessage(ClientException):
+    def __init__(self, reason: str, message: Message):
+        self.reason = reason
+        self.message = message

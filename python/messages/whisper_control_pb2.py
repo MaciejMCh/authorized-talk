@@ -14,12 +14,14 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15whisper_control.proto\"\\\n\x0cIntroduction\x12\x11\n\tpseudonym\x18\x01 \x01(\t\x12\x17\n\x0ftargetInterface\x18\x02 \x01(\t\x12\r\n\x05nonce\x18\x03 \x01(\x0c\x12\x11\n\tsignature\x18\x04 \x01(\x0c\"+\n\tChallenge\x12\x0b\n\x03otp\x18\x01 \x01(\x0c\x12\x11\n\tsignature\x18\x02 \x01(\x0c\"$\n\x0f\x43hallengeAnswer\x12\x11\n\tsignature\x18\x01 \x01(\x0c\"/\n\nAccessPass\x12\x11\n\tsignature\x18\x01 \x01(\x0c\x12\x0e\n\x06passes\x18\x02 \x01(\x08\x62\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15whisper_control.proto\"\\\n\x0cIntroduction\x12\x11\n\tpseudonym\x18\x01 \x01(\t\x12\x17\n\x0ftargetInterface\x18\x02 \x01(\t\x12\r\n\x05nonce\x18\x03 \x01(\x0c\x12\x11\n\tsignature\x18\x04 \x01(\x0c\"d\n\x14IntroductionReaction\x12\x1f\n\tchallenge\x18\x01 \x01(\x0b\x32\n.ChallengeH\x00\x12\x1f\n\trejection\x18\x02 \x01(\x0b\x32\n.RejectionH\x00\x42\n\n\x08reaction\"+\n\tChallenge\x12\x0b\n\x03otp\x18\x01 \x01(\x0c\x12\x11\n\tsignature\x18\x02 \x01(\x0c\"\x0b\n\tRejection\"$\n\x0f\x43hallengeAnswer\x12\x11\n\tsignature\x18\x01 \x01(\x0c\"/\n\nAccessPass\x12\x11\n\tsignature\x18\x01 \x01(\x0c\x12\x0e\n\x06passes\x18\x02 \x01(\x08\x62\x06proto3')
 
 
 
 _INTRODUCTION = DESCRIPTOR.message_types_by_name['Introduction']
+_INTRODUCTIONREACTION = DESCRIPTOR.message_types_by_name['IntroductionReaction']
 _CHALLENGE = DESCRIPTOR.message_types_by_name['Challenge']
+_REJECTION = DESCRIPTOR.message_types_by_name['Rejection']
 _CHALLENGEANSWER = DESCRIPTOR.message_types_by_name['ChallengeAnswer']
 _ACCESSPASS = DESCRIPTOR.message_types_by_name['AccessPass']
 Introduction = _reflection.GeneratedProtocolMessageType('Introduction', (_message.Message,), {
@@ -29,12 +31,26 @@ Introduction = _reflection.GeneratedProtocolMessageType('Introduction', (_messag
   })
 _sym_db.RegisterMessage(Introduction)
 
+IntroductionReaction = _reflection.GeneratedProtocolMessageType('IntroductionReaction', (_message.Message,), {
+  'DESCRIPTOR' : _INTRODUCTIONREACTION,
+  '__module__' : 'whisper_control_pb2'
+  # @@protoc_insertion_point(class_scope:IntroductionReaction)
+  })
+_sym_db.RegisterMessage(IntroductionReaction)
+
 Challenge = _reflection.GeneratedProtocolMessageType('Challenge', (_message.Message,), {
   'DESCRIPTOR' : _CHALLENGE,
   '__module__' : 'whisper_control_pb2'
   # @@protoc_insertion_point(class_scope:Challenge)
   })
 _sym_db.RegisterMessage(Challenge)
+
+Rejection = _reflection.GeneratedProtocolMessageType('Rejection', (_message.Message,), {
+  'DESCRIPTOR' : _REJECTION,
+  '__module__' : 'whisper_control_pb2'
+  # @@protoc_insertion_point(class_scope:Rejection)
+  })
+_sym_db.RegisterMessage(Rejection)
 
 ChallengeAnswer = _reflection.GeneratedProtocolMessageType('ChallengeAnswer', (_message.Message,), {
   'DESCRIPTOR' : _CHALLENGEANSWER,
@@ -55,10 +71,14 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._options = None
   _INTRODUCTION._serialized_start=25
   _INTRODUCTION._serialized_end=117
-  _CHALLENGE._serialized_start=119
-  _CHALLENGE._serialized_end=162
-  _CHALLENGEANSWER._serialized_start=164
-  _CHALLENGEANSWER._serialized_end=200
-  _ACCESSPASS._serialized_start=202
-  _ACCESSPASS._serialized_end=249
+  _INTRODUCTIONREACTION._serialized_start=119
+  _INTRODUCTIONREACTION._serialized_end=219
+  _CHALLENGE._serialized_start=221
+  _CHALLENGE._serialized_end=264
+  _REJECTION._serialized_start=266
+  _REJECTION._serialized_end=277
+  _CHALLENGEANSWER._serialized_start=279
+  _CHALLENGEANSWER._serialized_end=315
+  _ACCESSPASS._serialized_start=317
+  _ACCESSPASS._serialized_end=364
 # @@protoc_insertion_point(module_scope)

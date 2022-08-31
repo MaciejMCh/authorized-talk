@@ -7,10 +7,19 @@ message Introduction {
   bytes signature = 4;
 }
 
+message IntroductionReaction {
+  oneof reaction {
+    Challenge challenge = 1;
+    Rejection rejection = 2;
+  }
+}
+
 message Challenge {
   bytes otp = 1;
   bytes signature = 2;
 }
+
+message Rejection {}
 
 message ChallengeAnswer {
   bytes signature = 1;

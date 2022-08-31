@@ -8,12 +8,14 @@ from python.core.rsa_keys import RsaKeys
 from python.encryption.encryption import Encryption
 from python.encryption.rsa_encryption import RsaEncryption, DecryptionFailed
 from python.identity_server.identity_server import IdentityServer
-from python.medium.authorized.client_exceptions import ClientException, InvalidChallengeSignature, ReceivedInvalidCipher
+from python.medium.authorized.client_exceptions import ClientException, InvalidChallengeSignature, \
+    ReceivedInvalidCipher, RejectedByTarget, MalformedProtoMessage
 from python.medium.authorized.client_status import Status
 from python.medium.authorized.utils import introduction_signature, access_pass_signature
 from python.medium.kinds import SourceMedium
 from python.medium.medium import Medium
-from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer, AccessPass
+from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer, AccessPass, \
+    IntroductionReaction
 
 
 class AuthorizedClientMedium(Medium):
@@ -90,7 +92,7 @@ class AuthorizedClientMedium(Medium):
 
     def receive_message(self, message: bytes):
         if self.status == Status.INTRODUCING:
-            self.receive_challenge(message)
+            self.receive_introduction_reaction(message)
             return
         if self.status == Status.SUBMITTED:
             self.receive_access(message)
@@ -121,27 +123,38 @@ class AuthorizedClientMedium(Medium):
         else:
             self.fail('access pass signature not verified')
 
-    def receive_challenge(self, message: bytes):
+    def receive_introduction_reaction(self, message: bytes):
         try:
             decrypted = RsaEncryption.decrypt(cipher=message, private_key=self.rsa_keys.private_key)
-            challenge = Challenge()
-            challenge.ParseFromString(decrypted)
-            is_verified = RsaEncryption.verify(
-                message=self.nonce,
-                signature=challenge.signature,
-                public_key=self.target_public_key,
-            )
-
-            if is_verified:
-                create_task(self.answer_challenge(challenge=challenge))
+            reaction = IntroductionReaction()
+            reaction.ParseFromString(decrypted)
+            if reaction.HasField("challenge"):
+                self.receive_challenge(reaction.challenge)
+            elif reaction.HasField("rejection"):
+                self.fail(RejectedByTarget())
             else:
-                self.fail(InvalidChallengeSignature())
+                self.fail(MalformedProtoMessage(
+                    reason="none of challenge or rejection is present",
+                    message=reaction,
+                ))
         except DecryptionFailed as decryption_failed:
             self.fail(ReceivedInvalidCipher(
                 cipher=message,
                 status=self.status,
                 inner=decryption_failed,
             ))
+
+    def receive_challenge(self, challenge: Challenge):
+        is_verified = RsaEncryption.verify(
+            message=self.nonce,
+            signature=challenge.signature,
+            public_key=self.target_public_key,
+        )
+
+        if is_verified:
+            create_task(self.answer_challenge(challenge=challenge))
+        else:
+            self.fail(InvalidChallengeSignature())
 
     def fail(self, reason: ClientException):
         self.status = Status.FAILED

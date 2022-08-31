@@ -3,7 +3,7 @@ from typing import Tuple, Callable, Optional
 import websockets
 from python.websocket.location import Location
 
-DEBUG = False
+DEBUG = True
 
 
 class WebsocketClient:

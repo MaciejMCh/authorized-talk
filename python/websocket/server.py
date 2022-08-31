@@ -3,7 +3,7 @@ from asyncio import Future, Task, create_task
 from typing import Tuple, List, Optional, Callable
 from python.websocket.location import Location
 
-DEBUG = False
+DEBUG = True
 
 
 class WebsocketServerSession:
@@ -20,6 +20,7 @@ class WebsocketServerSession:
         self.on_message(message)
 
     async def send(self, message: bytes):
+        debug_print(f'server: send: {message}')
         await self.websocket.send(message)
 
     async def close(self):

@@ -3,7 +3,7 @@ from asyncio import Future, Task, create_task
 from typing import Tuple, List, Optional, Callable
 from python.websocket.location import Location
 
-DEBUG = True
+DEBUG = False
 
 
 class WebsocketServerSession:

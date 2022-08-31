@@ -1,4 +1,4 @@
-from rsa import PublicKey, PrivateKey
+from rsa import PublicKey, PrivateKey, DecryptionError, VerificationError
 import rsa
 
 HASH_METHOD = 'SHA-1'
@@ -9,6 +9,11 @@ CIPHER_SLICE_SIZE = 64
 DEBUG = False
 
 
+class DecryptionFailed(Exception):
+    def __init__(self, inner: Exception):
+        self.inner = inner
+
+
 class RsaEncryption:
     @classmethod
     def encrypt(cls, message: bytes, public_key: bytes) -> bytes:
@@ -16,7 +21,10 @@ class RsaEncryption:
 
     @classmethod
     def decrypt(cls, cipher: bytes, private_key: bytes) -> bytes:
-        return cls.decrypt_bytes(raw=cipher, private_key=cls.private_key_with_bytes(private_key))
+        try:
+            return cls.decrypt_bytes(raw=cipher, private_key=cls.private_key_with_bytes(private_key))
+        except DecryptionError as decryption_error:
+            raise DecryptionFailed(decryption_error)
 
     @classmethod
     def sign(cls, message: bytes, private_key: bytes) -> bytes:
@@ -24,8 +32,11 @@ class RsaEncryption:
 
     @classmethod
     def verify(cls, message: bytes, signature: bytes, public_key: bytes) -> bool:
-        result = rsa.verify(message, signature, cls.public_key_with_bytes(public_key))
-        return result == HASH_METHOD
+        try:
+            result = rsa.verify(message, signature, cls.public_key_with_bytes(public_key))
+            return result == HASH_METHOD
+        except VerificationError:
+            return False
 
     @classmethod
     def public_key_with_bytes(cls, key_bytes: bytes) -> PublicKey:

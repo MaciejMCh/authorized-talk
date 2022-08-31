@@ -9,7 +9,7 @@ from python.encryption.encryption import Encryption
 from python.encryption.rsa_encryption import RsaEncryption, DecryptionFailed
 from python.identity_server.identity_server import IdentityServer
 from python.medium.authorized.client_exceptions import ClientException, InvalidChallengeSignature, \
-    ReceivedInvalidCipher, RejectedByTarget, MalformedProtoMessage
+    ReceivedInvalidCipher, RejectedByTarget, MalformedProtoMessage, InvalidAccessPassSignature, ChallengeFailed
 from python.medium.authorized.client_status import Status
 from python.medium.authorized.utils import introduction_signature, access_pass_signature
 from python.medium.kinds import SourceMedium
@@ -40,7 +40,7 @@ class AuthorizedClientMedium(Medium):
         self.connected = get_running_loop().create_future()
         self.introducing = get_running_loop().create_future()
         self.challenged = get_running_loop().create_future()
-        self.submitted = get_running_loop().create_future()
+        self.submitting = get_running_loop().create_future()
         self.authorized = get_running_loop().create_future()
         self.failure: Future[ClientException] = get_running_loop().create_future()
 
@@ -94,7 +94,7 @@ class AuthorizedClientMedium(Medium):
         if self.status == Status.INTRODUCING:
             self.receive_introduction_reaction(message)
             return
-        if self.status == Status.SUBMITTED:
+        if self.status == Status.SUBMITTING:
             self.receive_access(message)
             return
         if self.status == Status.AUTHORIZED:
@@ -102,26 +102,33 @@ class AuthorizedClientMedium(Medium):
             return
 
     def receive_access(self, message: bytes):
-        decrypted = RsaEncryption.decrypt(cipher=message, private_key=self.rsa_keys.private_key)
-        access_pass = AccessPass()
-        access_pass.ParseFromString(decrypted)
-        is_verified = RsaEncryption.verify(
-            message=access_pass_signature(
-                source_pseudonym=self.pseudonym,
-                passes=access_pass.passes,
-            ),
-            signature=access_pass.signature,
-            public_key=self.target_public_key,
-        )
+        try:
+            decrypted = RsaEncryption.decrypt(cipher=message, private_key=self.rsa_keys.private_key)
+            access_pass = AccessPass()
+            access_pass.ParseFromString(decrypted)
+            is_verified = RsaEncryption.verify(
+                message=access_pass_signature(
+                    source_pseudonym=self.pseudonym,
+                    passes=access_pass.passes,
+                ),
+                signature=access_pass.signature,
+                public_key=self.target_public_key,
+            )
 
-        if is_verified:
-            if access_pass.passes:
-                self.status = Status.AUTHORIZED
-                self.authorized.set_result(None)
+            if is_verified:
+                if access_pass.passes:
+                    self.status = Status.AUTHORIZED
+                    self.authorized.set_result(None)
+                else:
+                    self.fail(ChallengeFailed())
             else:
-                self.fail('target rejected connection')
-        else:
-            self.fail('access pass signature not verified')
+                self.fail(InvalidAccessPassSignature())
+        except DecryptionFailed as decryption_failed:
+            self.fail(ReceivedInvalidCipher(
+                cipher=message,
+                status=self.status,
+                inner=decryption_failed,
+            ))
 
     def receive_introduction_reaction(self, message: bytes):
         try:
@@ -168,5 +175,5 @@ class AuthorizedClientMedium(Medium):
         message = challenge_answer.SerializeToString()
         cipher = RsaEncryption.encrypt(message=message, public_key=self.target_public_key)
         await self.medium.send(cipher)
-        self.status = Status.SUBMITTED
-        self.submitted.set_result(None)
+        self.status = Status.SUBMITTING
+        self.submitting.set_result(None)

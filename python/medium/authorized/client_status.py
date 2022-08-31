@@ -7,6 +7,6 @@ class Status(Enum):
     INTRODUCING = 3
     CHALLENGED = 4
     FAILED = 5
-    SUBMITTED = 6
+    SUBMITTING = 6
     ANSWERED = 7
     AUTHORIZED = 8

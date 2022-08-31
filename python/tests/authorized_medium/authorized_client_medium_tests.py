@@ -139,7 +139,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         server.close()
         await server_close
 
-    async def test_submitted_status(self):
+    async def test_submitting_status(self):
         bob_websocket_location = Location(host='localhost', port=8765)
         server, server_close = await run_server(bob_websocket_location)
 
@@ -177,7 +177,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         server.sessions[0].handle_message(receive_message)
 
         await server.sessions[0].send(cipher)
-        await medium.submitted
+        await medium.submitting
         await sleep(0.1)
 
         self.assertIsNotNone(received_message, 'challenge answer cipher should be received')
@@ -189,7 +189,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
             signature=challenge_answer.signature,
             public_key=alice_rsa_keys.public_key,
         ), 'challenge answer signature should be verified with source public key')
-        self.assertEqual(Status.SUBMITTED, medium.status, 'status should be Status.SUBMITTED')
+        self.assertEqual(Status.SUBMITTING, medium.status, 'status should be Status.SUBMITTING')
 
         server.close()
         await server_close
@@ -224,7 +224,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
         cipher = RsaEncryption.encrypt(message=introduction_reaction_bytes, public_key=alice_rsa_keys.public_key)
 
         await server.sessions[0].send(cipher)
-        await medium.submitted
+        await medium.submitting
         await sleep(0.1)
 
         access_pass_signature = RsaEncryption.sign(

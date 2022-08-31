@@ -26,3 +26,11 @@ class MalformedProtoMessage(ClientException):
     def __init__(self, reason: str, message: Message):
         self.reason = reason
         self.message = message
+
+
+class InvalidAccessPassSignature(ClientException):
+    pass
+
+
+class ChallengeFailed(ClientException):
+    pass

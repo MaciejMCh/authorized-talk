@@ -19,3 +19,7 @@ class ReceivedInvalidIntroductionSignature(ServerException):
 
 class AccessDenied(ServerException):
     pass
+
+
+class ReceivedInvalidAnswerSignature(ServerException):
+    pass

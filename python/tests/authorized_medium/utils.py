@@ -6,9 +6,10 @@ from python.encryption.rsa_encryption import RsaEncryption
 from python.identity_server.identity_server import IdentityServer
 from python.medium.authorized.client import AuthorizedClientMedium
 from python.medium.authorized.server import AuthorizedServerMedium
+from python.medium.authorized.utils import introduction_signature
 from python.medium.kinds import WebsocketTargetMedium, WebsocketSourceMedium
 from python.medium.websocket_medium import WebsocketMedium
-from python.messages.whisper_control_pb2 import IntroductionReaction, Challenge
+from python.messages.whisper_control_pb2 import IntroductionReaction, Challenge, Introduction
 from python.tests.utils import TestIdentityServer, bob_public_key, alice_rsa_keys, TestRandom, bob_private_key
 from python.websocket.client import run_client
 from python.websocket.location import Location
@@ -94,6 +95,51 @@ async def with_initial_status(identity_server: Optional[IdentityServer] = None):
         identity_server=identity_server,
         random=TestRandom(phrase=b'some_otp'),
     )
+
+    async def close():
+        server.close()
+        await server_close
+
+    return medium, client, close
+
+
+async def with_challenged_status(identity_server: Optional[IdentityServer] = None):
+    identity_server = TestIdentityServer(
+            target_mediums_by_pseudonyms={'alice': []},
+            public_keys_by_pseudonyms={'alice': alice_rsa_keys.public_key},
+            white_list={'bob': {'some_interface': ['master']}},
+            roles={'alice': ['master']}
+        ) if identity_server is None else identity_server
+    bob_websocket_location = Location(host='localhost', port=8765)
+    server, server_close = await run_server(bob_websocket_location)
+    client, _ = await run_client(bob_websocket_location)
+    medium = AuthorizedServerMedium(
+        pseudonym="bob",
+        medium=WebsocketMedium.server(server.sessions[0]),
+        rsa_keys=RsaKeys(private_key=bob_private_key, public_key=bob_public_key),
+        identity_server=identity_server,
+        random=TestRandom(phrase=b'some_otp'),
+    )
+
+    signature = RsaEncryption.sign(
+        message=introduction_signature(
+            pseudonym='alice',
+            target_interface='some_interface',
+            nonce=b'some_nonce',
+        ),
+        private_key=alice_rsa_keys.private_key,
+    )
+    introduction = Introduction(
+        pseudonym='alice',
+        targetInterface='some_interface',
+        nonce=b'some_nonce',
+        signature=signature,
+    )
+    introduction_bytes = introduction.SerializeToString()
+    introduction_cipher = RsaEncryption.encrypt(introduction_bytes, bob_public_key)
+
+    await client.send(introduction_cipher)
+    await medium.challenged
 
     async def close():
         server.close()

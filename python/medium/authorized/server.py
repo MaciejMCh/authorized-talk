@@ -8,7 +8,7 @@ from python.core.rsa_keys import RsaKeys
 from python.encryption.rsa_encryption import RsaEncryption, DecryptionFailed
 from python.identity_server.identity_server import IdentityServer
 from python.medium.authorized.server_exceptions import ServerException, ReceivedInvalidCipher, \
-    ReceivedInvalidIntroductionSignature, AccessDenied
+    ReceivedInvalidIntroductionSignature, AccessDenied, ReceivedInvalidAnswerSignature
 from python.medium.authorized.server_status import Status
 from python.medium.authorized.utils import introduction_signature
 from python.medium.medium import Medium
@@ -52,21 +52,28 @@ class AuthorizedServerMedium(Medium):
             return
 
     async def receive_challenge_answer(self, message: bytes):
-        decrypted_message = RsaEncryption.decrypt(cipher=message, private_key=self.rsa_keys.private_key)
-        challenge_answer = ChallengeAnswer()
-        challenge_answer.ParseFromString(decrypted_message)
-        is_verified = RsaEncryption.verify(
-            message=self.otp,
-            signature=challenge_answer.signature,
-            public_key=self.source_public_key,
-        )
-        if is_verified:
-            self.status = Status.AUTHORIZED
-            self.authorized.set_result(None)
-            await self.send_access_pass(True)
-        else:
-            await self.send_access_pass(False)
-            self.fail("invalid otp")
+        try:
+            decrypted_message = RsaEncryption.decrypt(cipher=message, private_key=self.rsa_keys.private_key)
+            challenge_answer = ChallengeAnswer()
+            challenge_answer.ParseFromString(decrypted_message)
+            is_verified = RsaEncryption.verify(
+                message=self.otp,
+                signature=challenge_answer.signature,
+                public_key=self.source_public_key,
+            )
+            if is_verified:
+                self.status = Status.AUTHORIZED
+                self.authorized.set_result(None)
+                await self.send_access_pass(True)
+            else:
+                await self.send_access_pass(False)
+                self.fail(ReceivedInvalidAnswerSignature())
+        except DecryptionFailed as decryption_failed:
+            self.fail(ReceivedInvalidCipher(
+                cipher=message,
+                status=self.status,
+                inner=decryption_failed,
+            ))
 
     async def receive_introduction(self, message: bytes):
         try:

@@ -122,7 +122,7 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
 
         await medium.introducing
         introduction_reaction = IntroductionReaction(
-            challenge = Challenge(
+            challenge=Challenge(
                 otp=b'some_otp',
                 signature=RsaEncryption.sign(
                     message=b'some_nonce',
@@ -256,6 +256,14 @@ class AuthorizedClientMediumTestCase(unittest.IsolatedAsyncioTestCase):
 # TODO: challenge checks: bob signed nonce
 
 # TODO: test repeat attacks scenarios
+
+# TODO: test sending authorized message
+
+# TODO: test protobuf parsing error
+
+# TODO: test sending system domain exceptions (access denied)
+
+# TODO: test handling double messages
 
 if __name__ == '__main__':
     unittest.main()

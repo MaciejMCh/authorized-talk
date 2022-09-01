@@ -41,9 +41,13 @@ class TestIdentityServer(IdentityServer):
             self,
             target_mediums_by_pseudonyms: Dict[str, List[TargetMedium]],
             public_keys_by_pseudonyms: Dict[str, bytes],
+            white_list=None,
+            roles=None,
     ):
         self.target_mediums_by_pseudonyms = target_mediums_by_pseudonyms
         self.public_keys_by_pseudonyms = public_keys_by_pseudonyms
+        self.white_list = white_list if white_list is not None else {}
+        self.roles = roles if roles is not None else {}
 
     async def get_available_mediums(self, pseudonym: str) -> List[TargetMedium]:
         if pseudonym not in self.target_mediums_by_pseudonyms:
@@ -56,6 +60,19 @@ class TestIdentityServer(IdentityServer):
             raise TargetNotFound()
 
         return self.public_keys_by_pseudonyms[pseudonym]
+
+    async def has_access(self, source_pseudonym: str, interface_identity: InterfaceIdentity) -> bool:
+        if interface_identity.pseudonym not in self.white_list:
+            return False
+        if source_pseudonym not in self.roles:
+            return False
+
+        permitted_roles = self.white_list[interface_identity.pseudonym][interface_identity.interface]
+        source_roles = self.roles[source_pseudonym]
+        for source_role in source_roles:
+            if source_role in permitted_roles:
+                return True
+        return False
 
 
 bob_public_key = b'MEgCQQCSzchHR/v/h4L9jVgwBPWX4W8Dlc0o+U9K22roxzGKSp78JfKAMkK4qh5A\n58shJJiM1yKvBxNVuRLoFcWxBmO5AgMBAAE='

@@ -1,11 +1,16 @@
-from typing import Tuple, Coroutine, Any, Callable
+from typing import Tuple, Coroutine, Any, Callable, Optional
 
 from python.core.interface_identity import InterfaceIdentity
+from python.core.rsa_keys import RsaKeys
 from python.encryption.rsa_encryption import RsaEncryption
+from python.identity_server.identity_server import IdentityServer
 from python.medium.authorized.client import AuthorizedClientMedium
+from python.medium.authorized.server import AuthorizedServerMedium
 from python.medium.kinds import WebsocketTargetMedium, WebsocketSourceMedium
+from python.medium.websocket_medium import WebsocketMedium
 from python.messages.whisper_control_pb2 import IntroductionReaction, Challenge
 from python.tests.utils import TestIdentityServer, bob_public_key, alice_rsa_keys, TestRandom, bob_private_key
+from python.websocket.client import run_client
 from python.websocket.location import Location
 from python.websocket.server import run_server, WebsocketServerSession
 
@@ -70,3 +75,28 @@ async def with_submitting_status():
         await server_close
 
     return medium, server.sessions[0], close
+
+
+async def with_initial_status(identity_server: Optional[IdentityServer] = None):
+    identity_server = TestIdentityServer(
+            target_mediums_by_pseudonyms={'alice': []},
+            public_keys_by_pseudonyms={'alice': alice_rsa_keys.public_key},
+            white_list={'bob': {'some_interface': ['master']}},
+            roles={'alice': ['master']}
+        ) if identity_server is None else identity_server
+    bob_websocket_location = Location(host='localhost', port=8765)
+    server, server_close = await run_server(bob_websocket_location)
+    client, _ = await run_client(bob_websocket_location)
+    medium = AuthorizedServerMedium(
+        pseudonym="bob",
+        medium=WebsocketMedium.server(server.sessions[0]),
+        rsa_keys=RsaKeys(private_key=bob_private_key, public_key=bob_public_key),
+        identity_server=identity_server,
+        random=TestRandom(phrase=b'some_otp'),
+    )
+
+    async def close():
+        server.close()
+        await server_close
+
+    return medium, client, close

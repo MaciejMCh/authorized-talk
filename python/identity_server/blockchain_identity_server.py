@@ -23,7 +23,8 @@ class BlockchainIdentityServer(IdentityServer):
         ))]
 
     async def get_public_key(self, pseudonym: str) -> bytes:
-        return await self.identity_server_contract.get_public_key(pseudonym)
+        actor = self.identity_server_contract.get_actor(pseudonym)
+        return actor[0] if actor[2] else None
 
     async def has_access(self, source_pseudonym: str, interface_identity: InterfaceIdentity) -> bool:
         return await self.identity_server_contract.has_access(source_pseudonym, interface_identity.pseudonym, interface_identity.interface)

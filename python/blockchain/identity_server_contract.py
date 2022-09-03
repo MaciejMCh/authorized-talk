@@ -57,3 +57,43 @@ class IdentityServerContract:
 
     def get_actor(self, pseudonym: str) -> Actor:
         return self.contract.functions.getActor(pseudonym).call()
+
+    def assign_roles(
+        self,
+        account: Account,
+        pseudonym: str,
+        roles: List[str],
+    ):
+        try:
+            tx_hash = self.contract.functions.assignRoles(
+                pseudonym,
+                roles,
+            ).transact({"from": account.address})
+            self.contract.web3.eth.wait_for_transaction_receipt(tx_hash)
+        except SolidityError:
+            raise TransactionReverted("failed to read reason")
+
+    def add_to_whitelist(
+        self,
+        account: Account,
+        pseudonym: str,
+        interface: str,
+        roles: List[str],
+    ):
+        try:
+            tx_hash = self.contract.functions.addToWhitelist(
+                pseudonym,
+                interface,
+                roles,
+            ).transact({"from": account.address})
+            self.contract.web3.eth.wait_for_transaction_receipt(tx_hash)
+        except SolidityError:
+            raise TransactionReverted("failed to read reason")
+
+    def has_access(
+        self,
+        source_pseudonym: str,
+        target_pseudonym: str,
+        target_interface: str,
+    ):
+        return self.contract.functions.hasAccess(source_pseudonym, target_pseudonym, target_interface).call()

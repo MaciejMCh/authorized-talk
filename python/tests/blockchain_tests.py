@@ -3,6 +3,7 @@ import unittest
 from python.blockchain.blockchain import Blockchain
 from python.blockchain.smart_contract import SmartContract, load_abi
 from python.blockchain.sol_sources import sol_named
+from python.tests.smart_contract.test_accounts import test_accounts
 
 
 class BlockchainTestCase(unittest.TestCase):
@@ -15,13 +16,20 @@ class BlockchainTestCase(unittest.TestCase):
 
     def test_deploy_smart_contract(self):
         blockchain = Blockchain.local()
-        smart_contract = SmartContract.deploy(blockchain=blockchain, sol_file_path=sol_named("AlwaysCompiles"))
+        accounts = test_accounts(blockchain)
+        smart_contract = SmartContract.deploy(
+            blockchain=blockchain,
+            account=accounts.admin,
+            sol_file_path=sol_named("AlwaysCompiles"),
+        )
         self.assertIsNotNone(smart_contract.w3Contract, "should deploy smart contract")
 
     def test_get_deployed_smart_contract(self):
         blockchain = Blockchain.local()
+        accounts = test_accounts(blockchain)
         deployed = SmartContract.deploy(
             blockchain=blockchain,
+            account=accounts.admin,
             sol_file_path=sol_named("AlwaysCompiles"),
         )
         got = SmartContract.deployed(
@@ -34,8 +42,10 @@ class BlockchainTestCase(unittest.TestCase):
 
     def test_get_abi(self):
         blockchain = Blockchain.local()
+        accounts = test_accounts(blockchain)
         deployed = SmartContract.deploy(
             blockchain=blockchain,
+            account=accounts.admin,
             sol_file_path=sol_named("AlwaysCompiles"),
         )
         got = SmartContract.deployed(

@@ -11,7 +11,6 @@ contract IdentityServer {
     }
 
     struct Actor {
-        string pseudonym;
         bytes publicKey;
         WebsocketMedium websocketMedium;
         bool registered;
@@ -19,20 +18,8 @@ contract IdentityServer {
 
     mapping(address => Actor) private actors;
 
-    function connect(
-        string calldata pseudonym,
-        bytes calldata publicKey,
-        WebsocketMedium calldata websocketMedium
-    )
-        external
-    {
-        Actor memory existingActor = actors[msg.sender];
-        if (existingActor.registered && !compareStrings(pseudonym, existingActor.pseudonym)) {
-            revert IdentityServer__ActorAlreadyExists();
-        }
-
+    function connect(bytes calldata publicKey, WebsocketMedium calldata websocketMedium) external {
         Actor memory newActor = Actor({
-            pseudonym: pseudonym,
             publicKey: publicKey,
             websocketMedium: websocketMedium,
             registered: true
@@ -41,23 +28,7 @@ contract IdentityServer {
         actors[msg.sender] = newActor;
     }
 
-    function compareStrings(
-        string memory a,
-        string memory b
-    )
-        internal
-        pure
-        returns (bool)
-    {
-        return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
-    }
-
-    function myPseudonym()
-        external
-        view
-        returns (string memory)
-    {
-        Actor memory me = actors[msg.sender];
-        return me.pseudonym;
+    function getActor(address identity) external view returns (Actor memory) {
+        return actors[identity];
     }
 }

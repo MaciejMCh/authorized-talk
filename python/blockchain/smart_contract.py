@@ -2,6 +2,8 @@ from typing import Dict, List
 
 from solcx import compile_source
 from web3.contract import Contract
+
+from python.blockchain.account import Account
 from python.blockchain.blockchain import Blockchain
 from eth_typing.evm import Address
 
@@ -28,6 +30,7 @@ class SmartContract:
     def deploy(
             cls,
             blockchain: Blockchain,
+            account: Account,
             sol_file_path: str,
     ):
         w3 = blockchain.w3
@@ -38,9 +41,8 @@ class SmartContract:
         contract_id, contract_interface = compiled_sol.popitem()
         bytecode = contract_interface['bin']
         abi = contract_interface['abi']
-        w3.eth.default_account = w3.eth.accounts[0]
         ContractType = w3.eth.contract(abi=abi, bytecode=bytecode)
-        tx_hash = ContractType.constructor().transact()
+        tx_hash = ContractType.constructor().transact({"from": account.address})
         tx_receipt = w3.eth.wait_for_transaction_receipt(tx_hash)
         return cls.deployed(
             blockchain=blockchain,

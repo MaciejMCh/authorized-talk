@@ -1,7 +1,21 @@
+from typing import Tuple, List
+from python.blockchain.account import Account
 from python.blockchain.blockchain import Blockchain
-from python.blockchain.smart_contract import SmartContract
+from python.blockchain.smart_contract import SmartContract, load_abi
 from python.blockchain.sol_sources import sol_named
+from python.medium.kinds import TargetMedium, WebsocketTargetMedium
 from python.websocket.location import Location
+from eth_typing.evm import Address
+from web3.exceptions import SolidityError
+
+WebsocketLocation = Tuple[str, int]
+
+Actor = Tuple[bytes, WebsocketLocation, bool]
+
+
+class TransactionReverted(Exception):
+    def __init__(self, error: str):
+        self.error = error
 
 
 class IdentityServerContract:
@@ -9,22 +23,37 @@ class IdentityServerContract:
         self.contract = smart_contract.w3Contract
 
     @classmethod
-    def deploy(cls, blockchain: Blockchain):
+    def deploy(cls, blockchain: Blockchain, account: Account):
         smart_contract = SmartContract.deploy(
             blockchain=blockchain,
+            account=account,
             sol_file_path=sol_named("IdentityServer"),
+        )
+        return IdentityServerContract(smart_contract)
+
+    @classmethod
+    def deployed(cls, blockchain: Blockchain, address: Address):
+        smart_contract = SmartContract.deployed(
+            blockchain=blockchain,
+            address=address,
+            abi=load_abi(sol_file_path=sol_named("AlwaysCompiles")),
         )
         return IdentityServerContract(smart_contract)
 
     def connect(
         self,
-        pseudonym: str,
+        account: Account,
         websocketLocation: Location,
         publicKey: bytes,
     ):
-        tx_hash = self.contract.functions.connect(
-            pseudonym,
-            publicKey,
-            (websocketLocation.host, websocketLocation.port),
-        ).transact()
-        self.contract.web3.eth.wait_for_transaction_receipt(tx_hash)
+        try:
+            tx_hash = self.contract.functions.connect(
+                publicKey,
+                (websocketLocation.host, websocketLocation.port),
+            ).transact({"from": account.address})
+            self.contract.web3.eth.wait_for_transaction_receipt(tx_hash)
+        except SolidityError:
+            raise TransactionReverted("failed to read reason")
+
+    def get_actor(self, pseudonym: str) -> Actor:
+        return self.contract.functions.getActor(pseudonym).call()

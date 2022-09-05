@@ -3,6 +3,7 @@ from typing import Tuple, List, Callable
 from google.protobuf.reflection import GeneratedProtocolMessageType
 
 from python.example.one_of_all_commands import one_of_all_commands
+from python.example.protobuf_utils import parse_system_object
 from python.medium.medium import Medium
 from google.protobuf.message import Message
 from google.protobuf.reflection import GeneratedProtocolMessageType
@@ -15,10 +16,14 @@ def implement_interface(
     medium: Medium,
     handle_command: Callable[[Message], None],
 ):
+    OneOfAllCommands = one_of_all_commands(actor_type)
+
     def on_message(message: bytes):
-        one_of_all = one_of_all_commands()
+        one_of_all = OneOfAllCommands()
         one_of_all.ParseFromString(message)
-        return one_of_all.one
+        the_one_key = one_of_all.WhichOneof("command")
+        the_one_property = getattr(one_of_all, the_one_key)
+        handle_command(the_one_property)
 
     medium.handle_message(on_message)
 

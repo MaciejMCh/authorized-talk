@@ -18,22 +18,19 @@ class TestConnector(Connector):
             interface_identity: InterfaceIdentity,
             on_message: Callable[[bytes], None],
     ) -> Medium:
-        testMedium = TestMedium(on_message)
+        testMedium = TestMedium()
+        testMedium.handle_message(on_message)
         self.testMedium = testMedium
         return testMedium
 
 
 class TestMedium(Medium):
-    def __init__(self, onMessage: Callable[[bytes], None]):
+    def __init__(self):
         super().__init__()
-        self.onMessage = onMessage
         self.sentMessages: List[bytes] = []
 
-    async def send(self, message: bytes):
+    def send(self, message: bytes):
         self.sentMessages.append(message)
-
-    def receive(self, message: bytes):
-        self.onMessage(message)
 
 
 class TestIdentityServer(IdentityServer):

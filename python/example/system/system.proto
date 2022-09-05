@@ -6,6 +6,13 @@ message Interface {}
 message Command {}
 message Message {}
 
+// Results
+message Result {
+  uint64 requestNonce = 101;
+}
+
+message Success {}
+
 // Drone
 message Drone {
   Actor systemBase = 1;
@@ -37,5 +44,17 @@ message ControllerInterface {
 }
 
 message TakeOff {
+  message Result {
+    oneof result {
+      Success success = 1;
+      InvalidDroneState invalidDroneState = 2;
+    }
+  }
+
   Command systemBase = 1;
+}
+
+// Errors
+message InvalidDroneState {
+
 }

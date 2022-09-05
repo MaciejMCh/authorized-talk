@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0csystem.proto\"\x07\n\x05\x41\x63tor\"\x0b\n\tInterface\"\t\n\x07\x43ommand\"\t\n\x07Message\"u\n\x05\x44rone\x12\x1a\n\nsystemBase\x18\x01 \x01(\x0b\x32\x06.Actor\x12&\n\ttelemetry\x18\x02 \x01(\x0b\x32\x13.TelemetryInterface\x12(\n\ncontroller\x18\x03 \x01(\x0b\x32\x14.ControllerInterface\"\x9a\x01\n\x12TelemetryInterface\x12\x1e\n\nsystemBase\x18\x01 \x01(\x0b\x32\n.Interface\x12+\n\x10requestTelemetry\x18\x02 \x01(\x0b\x32\x11.RequestTelemetry\x12\x37\n\x16telemetryUpdateMessage\x18\x03 \x01(\x0b\x32\x17.TelemetryUpdateMessage\"F\n\x10RequestTelemetry\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Command\x12\x14\n\x0cupdatePeriod\x18\x02 \x01(\x02\"L\n\x16TelemetryUpdateMessage\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Message\x12\x14\n\x0c\x62\x61tteryLevel\x18\x02 \x01(\x02\"P\n\x13\x43ontrollerInterface\x12\x1e\n\nsystemBase\x18\x01 \x01(\x0b\x32\n.Interface\x12\x19\n\x07takeOff\x18\x02 \x01(\x0b\x32\x08.TakeOff\"\'\n\x07TakeOff\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Commandb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0csystem.proto\"\x07\n\x05\x41\x63tor\"\x0b\n\tInterface\"\t\n\x07\x43ommand\"\t\n\x07Message\"u\n\x05\x44rone\x12\x1a\n\nsystemBase\x18\x01 \x01(\x0b\x32\x06.Actor\x12&\n\ttelemetry\x18\x02 \x01(\x0b\x32\x13.TelemetryInterface\x12(\n\ncontroller\x18\x03 \x01(\x0b\x32\x14.ControllerInterface\"\x94\x01\n\x12TelemetryInterface\x12\x1e\n\nsystemBase\x18\x01 \x01(\x0b\x32\n.Interface\x12%\n\rreadTelemetry\x18\x02 \x01(\x0b\x32\x0e.ReadTelemetry\x12\x37\n\x16telemetryUpdateMessage\x18\x03 \x01(\x0b\x32\x17.TelemetryUpdateMessage\"C\n\rReadTelemetry\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Command\x12\x14\n\x0cupdatePeriod\x18\x02 \x01(\x02\"L\n\x16TelemetryUpdateMessage\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Message\x12\x14\n\x0c\x62\x61tteryLevel\x18\x02 \x01(\x02\"P\n\x13\x43ontrollerInterface\x12\x1e\n\nsystemBase\x18\x01 \x01(\x0b\x32\n.Interface\x12\x19\n\x07takeOff\x18\x02 \x01(\x0b\x32\x08.TakeOff\"\'\n\x07TakeOff\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Commandb\x06proto3')
 
 
 
@@ -24,7 +24,7 @@ _COMMAND = DESCRIPTOR.message_types_by_name['Command']
 _MESSAGE = DESCRIPTOR.message_types_by_name['Message']
 _DRONE = DESCRIPTOR.message_types_by_name['Drone']
 _TELEMETRYINTERFACE = DESCRIPTOR.message_types_by_name['TelemetryInterface']
-_REQUESTTELEMETRY = DESCRIPTOR.message_types_by_name['RequestTelemetry']
+_READTELEMETRY = DESCRIPTOR.message_types_by_name['ReadTelemetry']
 _TELEMETRYUPDATEMESSAGE = DESCRIPTOR.message_types_by_name['TelemetryUpdateMessage']
 _CONTROLLERINTERFACE = DESCRIPTOR.message_types_by_name['ControllerInterface']
 _TAKEOFF = DESCRIPTOR.message_types_by_name['TakeOff']
@@ -70,12 +70,12 @@ TelemetryInterface = _reflection.GeneratedProtocolMessageType('TelemetryInterfac
   })
 _sym_db.RegisterMessage(TelemetryInterface)
 
-RequestTelemetry = _reflection.GeneratedProtocolMessageType('RequestTelemetry', (_message.Message,), {
-  'DESCRIPTOR' : _REQUESTTELEMETRY,
+ReadTelemetry = _reflection.GeneratedProtocolMessageType('ReadTelemetry', (_message.Message,), {
+  'DESCRIPTOR' : _READTELEMETRY,
   '__module__' : 'system_pb2'
-  # @@protoc_insertion_point(class_scope:RequestTelemetry)
+  # @@protoc_insertion_point(class_scope:ReadTelemetry)
   })
-_sym_db.RegisterMessage(RequestTelemetry)
+_sym_db.RegisterMessage(ReadTelemetry)
 
 TelemetryUpdateMessage = _reflection.GeneratedProtocolMessageType('TelemetryUpdateMessage', (_message.Message,), {
   'DESCRIPTOR' : _TELEMETRYUPDATEMESSAGE,
@@ -112,13 +112,13 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _DRONE._serialized_start=60
   _DRONE._serialized_end=177
   _TELEMETRYINTERFACE._serialized_start=180
-  _TELEMETRYINTERFACE._serialized_end=334
-  _REQUESTTELEMETRY._serialized_start=336
-  _REQUESTTELEMETRY._serialized_end=406
-  _TELEMETRYUPDATEMESSAGE._serialized_start=408
-  _TELEMETRYUPDATEMESSAGE._serialized_end=484
-  _CONTROLLERINTERFACE._serialized_start=486
-  _CONTROLLERINTERFACE._serialized_end=566
-  _TAKEOFF._serialized_start=568
-  _TAKEOFF._serialized_end=607
+  _TELEMETRYINTERFACE._serialized_end=328
+  _READTELEMETRY._serialized_start=330
+  _READTELEMETRY._serialized_end=397
+  _TELEMETRYUPDATEMESSAGE._serialized_start=399
+  _TELEMETRYUPDATEMESSAGE._serialized_end=475
+  _CONTROLLERINTERFACE._serialized_start=477
+  _CONTROLLERINTERFACE._serialized_end=557
+  _TAKEOFF._serialized_start=559
+  _TAKEOFF._serialized_end=598
 # @@protoc_insertion_point(module_scope)

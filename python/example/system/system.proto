@@ -16,11 +16,11 @@ message Drone {
 // Drone - Telemetry
 message TelemetryInterface {
   Interface systemBase = 1;
-  RequestTelemetry requestTelemetry = 2;
+  ReadTelemetry readTelemetry = 2;
   TelemetryUpdateMessage telemetryUpdateMessage = 3;
 }
 
-message RequestTelemetry {
+message ReadTelemetry {
   Command systemBase = 1;
   float updatePeriod = 2;
 }

@@ -5,7 +5,7 @@ from typing import Optional
 from google.protobuf.message import Message
 from python.example.implement_interface import implement_interface
 from python.example.one_of_all_commands import one_of_all_commands
-from python.example.proto.system_pb2 import Drone, TakeOff
+from python.example.proto.system_pb2 import Drone, TakeOff, ReadTelemetry
 from python.tests.utils import TestMedium
 
 
@@ -48,7 +48,7 @@ class ImplementInterfaceTestCase(unittest.IsolatedAsyncioTestCase):
         )
 
         OneOfAllCommands = one_of_all_commands(Drone)
-        message = OneOfAllCommands(takeOff=TakeOff())
+        message = OneOfAllCommands(readTelemetry=ReadTelemetry())
         message_bytes = message.SerializeToString()
         medium.receive_message(message_bytes)
         self.assertIsNone(received_command, "should not receive read telemetry command")

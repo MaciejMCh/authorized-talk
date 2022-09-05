@@ -29,7 +29,7 @@ class TestMedium(Medium):
         self.onMessage = onMessage
         self.sentMessages: List[bytes] = []
 
-    def send(self, message: bytes):
+    async def send(self, message: bytes):
         self.sentMessages.append(message)
 
     def receive(self, message: bytes):

@@ -9,18 +9,18 @@ message Message {}
 // Drone
 message Drone {
   Actor systemBase = 1;
-  TelemetryInterface telemetryInterface = 2;
-  ControllerInterface controllerInterface = 3;
+  TelemetryInterface telemetry = 2;
+  ControllerInterface controller = 3;
 }
 
 // Drone - Telemetry
 message TelemetryInterface {
   Interface systemBase = 1;
-  RequestTelemetryCommand requestTelemetryCommand = 2;
+  RequestTelemetry requestTelemetry = 2;
   TelemetryUpdateMessage telemetryUpdateMessage = 3;
 }
 
-message RequestTelemetryCommand {
+message RequestTelemetry {
   Command systemBase = 1;
   float updatePeriod = 2;
 }
@@ -33,9 +33,9 @@ message TelemetryUpdateMessage {
 // Drone - Controller
 message ControllerInterface {
   Interface systemBase = 1;
-  StartCommand startCommand = 2;
+  TakeOff takeOff = 2;
 }
 
-message StartCommand {
+message TakeOff {
   Command systemBase = 1;
 }

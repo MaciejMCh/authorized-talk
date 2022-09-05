@@ -31,12 +31,18 @@ class WebsocketServer:
     def __init__(self):
         self.server = None
         self.sessions: List[WebsocketServerSession] = []
+        self.session_opened_handler: Optional[Callable[[WebsocketServerSession], None]] = None
 
     def initialize(self, server):
         self.server = server
 
+    def handle_session_opened(self, handler: Callable[[WebsocketServerSession], None]):
+        self.session_opened_handler = handler
+
     def connectSession(self, websocket) -> WebsocketServerSession:
         session = WebsocketServerSession(websocket)
+        if self.session_opened_handler is not None:
+            self.session_opened_handler(session)
         self.sessions.append(session)
         return session
 

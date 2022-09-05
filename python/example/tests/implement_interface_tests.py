@@ -26,7 +26,10 @@ class ImplementInterfaceTestCase(unittest.IsolatedAsyncioTestCase):
         )
 
         OneOfAllCommands = one_of_all_commands(Drone)
-        message = OneOfAllCommands(takeOff=TakeOff())
+        message = OneOfAllCommands(
+            takeOff=TakeOff(),
+            nonce=2,
+        )
         message_bytes = message.SerializeToString()
         medium.receive_message(message_bytes)
         self.assertIsNotNone(received_command, "should receive take off command")

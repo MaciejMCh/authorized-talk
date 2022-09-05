@@ -7,7 +7,7 @@ from google.protobuf.descriptor_pool import DescriptorPool
 from python.example.protobuf_utils import parse_system_object
 
 
-def one_of_all_commands(actor_type: GeneratedProtocolMessageType):
+def one_of_all_commands(actor_type: GeneratedProtocolMessageType) -> GeneratedProtocolMessageType:
     fields_descriptors = commands_fields_descriptors(actor_type)
     prototype = make_one_of_prototype(fields_descriptors)
     return prototype

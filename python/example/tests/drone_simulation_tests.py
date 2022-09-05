@@ -22,10 +22,9 @@ class DroneSimulationTestCase(unittest.TestCase):
             account=accounts.bob,
         )
 
-        # operator = Operator(
-        #     identity_server_contract=identity_server_contract,
-        #     account=accounts.alice,
-        # )
+        operator = Operator()
+
+        operator.verify_drone()
 
 
 if __name__ == '__main__':

@@ -111,7 +111,6 @@ class AuthorizedServerMedium(Medium):
                 inner=decryption_failed,
             ))
 
-
     async def challenge(self, nonce: bytes):
         self.otp = await self.random.generate()
         introduction_reaction = IntroductionReaction(
@@ -151,3 +150,9 @@ class AuthorizedServerMedium(Medium):
     def fail(self, server_exception: ServerException):
         self.status = Status.FAILED
         self.failure.set_result(server_exception)
+
+    async def send(self, message: bytes):
+        if self.status != Status.AUTHORIZED:
+            raise Exception(f"trying to send message in not authorized state: {self.status}")
+
+        await self.medium.send(message)

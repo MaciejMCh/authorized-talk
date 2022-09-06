@@ -7,6 +7,9 @@ from python.medium.kinds import TargetMedium, WebsocketTargetMedium
 from python.websocket.location import Location
 
 
+DEBUG = True
+
+
 class BlockchainIdentityServer(IdentityServer):
     def __init__(self, identity_server_contract: IdentityServerContract):
         self.identity_server_contract = identity_server_contract
@@ -24,7 +27,13 @@ class BlockchainIdentityServer(IdentityServer):
 
     async def get_public_key(self, pseudonym: str) -> bytes:
         actor = self.identity_server_contract.get_actor(pseudonym)
+        debug_print(f"got actor:\t\t{pseudonym}: {actor}")
         return actor[0] if actor[2] else None
 
     async def has_access(self, source_pseudonym: str, interface_identity: InterfaceIdentity) -> bool:
         return await self.identity_server_contract.has_access(source_pseudonym, interface_identity.pseudonym, interface_identity.interface)
+
+
+def debug_print(message: str):
+    if DEBUG:
+        print(f"identity server: {message}")

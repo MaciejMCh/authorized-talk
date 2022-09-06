@@ -1,5 +1,5 @@
 from asyncio import get_running_loop, Future
-from typing import Dict
+from typing import Dict, Optional
 
 from python.blockchain.account import Account
 from python.blockchain.identity_server_contract import IdentityServerContract
@@ -12,6 +12,7 @@ from python.example.proto.system_pb2 import Message
 from python.identity_server.blockchain_identity_server import BlockchainIdentityServer
 from python.medium.authorized.client import AuthorizedClientMedium
 from python.medium.kinds import WebsocketSourceMedium
+from python.websocket.location import Location
 
 
 class Commander:
@@ -22,16 +23,35 @@ class Commander:
         target: InterfaceIdentity,
         identity_server_contract: IdentityServerContract,
     ):
+        self.account = account
         self.target_actor_type = target_actor_type
+        self.target = target
+        self.identity_server_contract = identity_server_contract
+        self.rsa_keys = RsaKeys.generate()
         self.nonce = 0
         self.pending_commands: Dict[int, Future[Message]] = {}
+        self.initialize()
+        self.medium: Optional[AuthorizedClientMedium] = None
+
+    def initialize(self):
+        self.connect_to_identity_server()
+        self.connect_to_target()
+
+    def connect_to_target(self):
         self.medium = AuthorizedClientMedium(
-            pseudonym=account.pseudonym,
-            target=target,
-            identity_server=BlockchainIdentityServer(identity_server_contract),
+            pseudonym=self.account.pseudonym,
+            target=self.target,
+            identity_server=BlockchainIdentityServer(self.identity_server_contract),
             available_source_mediums=[WebsocketSourceMedium()],
-            rsa_keys=RsaKeys.generate(),
+            rsa_keys=self.rsa_keys,
             random=BuiltInRandom(),
+        )
+
+    def connect_to_identity_server(self):
+        self.identity_server_contract.connect(
+            account=self.account,
+            publicKey=self.rsa_keys.public_key,
+            websocketLocation=Location(host="", port=0),
         )
 
     async def send(self, message: Message) -> Message:

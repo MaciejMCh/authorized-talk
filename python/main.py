@@ -52,7 +52,7 @@ async def main():
         identity_server_contract=identity_server_contract,
     )
 
-    await sleep(5)
+    await sleep(1)
 
     await operator.verify_drone()
 

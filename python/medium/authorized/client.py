@@ -18,6 +18,9 @@ from python.messages.whisper_control_pb2 import Introduction, Challenge, Challen
     IntroductionReaction
 
 
+DEBUG = True
+
+
 class AuthorizedClientMedium(Medium):
     def __init__(
             self,
@@ -28,6 +31,7 @@ class AuthorizedClientMedium(Medium):
             rsa_keys: RsaKeys,
             random: Random,
     ):
+        debug_print(f"init\n\tpseudonym:\t\t{pseudonym}\n\tpublic key:\t\t{rsa_keys.public_key}\n\tprivate key:\t{rsa_keys.private_key}")
         super().__init__()
         self.pseudonym = pseudonym
         self.status = Status.INITIAL
@@ -65,14 +69,16 @@ class AuthorizedClientMedium(Medium):
     async def introduce(self, target: InterfaceIdentity):
         self.nonce = await self.random.generate()
         self.target_public_key = await self.identity_server.get_public_key(target.pseudonym)
+        signature_message = introduction_signature(
+            pseudonym=self.pseudonym,
+            target_interface=target.interface,
+            nonce=self.nonce,
+        )
         signature = RsaEncryption.sign(
-            message=introduction_signature(
-                pseudonym=self.pseudonym,
-                target_interface=target.interface,
-                nonce=self.nonce,
-            ),
+            message=signature_message,
             private_key=self.rsa_keys.private_key,
         )
+        debug_print(f"introduction signature message: {signature_message}")
 
         introduction = Introduction(
             pseudonym=self.pseudonym,
@@ -183,3 +189,8 @@ class AuthorizedClientMedium(Medium):
             raise Exception(f"attempt to send message in not authorized status: {self.status}")
 
         await self.medium.send(message)
+
+
+def debug_print(message: str):
+    if DEBUG:
+        print(f"authorized client medium: {message}")

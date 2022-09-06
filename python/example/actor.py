@@ -15,6 +15,9 @@ from python.websocket.location import Location
 from python.websocket.server import run_server, WebsocketServerSession
 
 
+DEBUG = True
+
+
 class Actor:
     def __init__(
         self,
@@ -62,8 +65,14 @@ class Actor:
         server.handle_session_opened(on_session_opened)
 
     def connect_to_identity_server(self):
+        debug_print(f"connect to identity server:\n\taccount:\t\t{self.account.pseudonym}\n\tpublic key:\t\t{self.rsa_keys.public_key}")
         self.identity_server_contract.connect(
             account=self.account,
             publicKey=self.rsa_keys.public_key,
             websocketLocation=self.websocket_location,
         )
+
+
+def debug_print(message: str):
+    if DEBUG:
+        print(f"actor: {message}")

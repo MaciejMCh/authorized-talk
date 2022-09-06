@@ -8,6 +8,10 @@ from python.websocket.location import Location
 from eth_typing.evm import Address
 from web3.exceptions import SolidityError
 
+
+DEBUG = True
+
+
 WebsocketLocation = Tuple[str, int]
 
 Actor = Tuple[bytes, WebsocketLocation, bool]
@@ -47,6 +51,7 @@ class IdentityServerContract:
         publicKey: bytes,
     ):
         try:
+            debug_print(f"connect:\n\tpseudonym:\t\t{account.pseudonym}\n\tpublic key:\t\t{publicKey}")
             tx_hash = self.contract.functions.connect(
                 publicKey,
                 (websocketLocation.host, websocketLocation.port),
@@ -97,3 +102,8 @@ class IdentityServerContract:
         target_interface: str,
     ):
         return self.contract.functions.hasAccess(source_pseudonym, target_pseudonym, target_interface).call()
+
+
+def debug_print(message: str):
+    if DEBUG:
+        print(f"contract: {message}")

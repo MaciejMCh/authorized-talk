@@ -28,6 +28,7 @@ class AuthorizedServerMedium(Medium):
             identity_server: IdentityServer,
             random: Random,
     ):
+        debug_print(f"init\n\tpseudonym:\t\t{pseudonym}\n\tpublic key:\t\t{rsa_keys.public_key}\n\tprivate key:\t{rsa_keys.private_key}")
         super().__init__()
         self.pseudonym = pseudonym
         self.medium = medium
@@ -90,12 +91,14 @@ class AuthorizedServerMedium(Medium):
             if self.source_public_key is None:
                 self.fail(SourceNotIdentified())
                 return
+            signature_message = introduction_signature(
+                pseudonym=introduction.pseudonym,
+                target_interface=introduction.targetInterface,
+                nonce=introduction.nonce,
+            )
+            debug_print(f"verify introduction:\n\tmessage:\t\t{signature_message}\n\tsignature:\t\t{introduction.signature}\n\tpublic key:\t\t{self.source_public_key}")
             if_verified = RsaEncryption.verify(
-                message=introduction_signature(
-                    pseudonym=introduction.pseudonym,
-                    target_interface=introduction.targetInterface,
-                    nonce=introduction.nonce,
-                ),
+                message=signature_message,
                 signature=introduction.signature,
                 public_key=self.source_public_key,
             )
@@ -170,4 +173,4 @@ class AuthorizedServerMedium(Medium):
 
 def debug_print(message: str):
     if DEBUG:
-        print(message)
+        print(f"authorized server medium: {message}")

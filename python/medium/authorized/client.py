@@ -57,7 +57,7 @@ class AuthorizedClientMedium(Medium):
         self.medium = await AuthorizedConnector(
             identity_server=self.identity_server,
             available_source_mediums=available_source_mediums,
-        ).establish_connection(target, self.receive_message)
+        ).establish_connection(target, self.handle_medium_message)
         self.status = Status.CONNECTED
         self.connected.set_result(None)
         create_task(self.introduce(target))
@@ -90,7 +90,7 @@ class AuthorizedClientMedium(Medium):
         self.status = Status.INTRODUCING
         self.introducing.set_result(None)
 
-    def receive_message(self, message: bytes):
+    def handle_medium_message(self, message: bytes):
         if self.status == Status.INTRODUCING:
             self.receive_introduction_reaction(message)
             return

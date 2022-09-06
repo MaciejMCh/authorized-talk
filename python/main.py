@@ -37,11 +37,26 @@ async def main():
         account=accounts.admin,
     )
 
+    identity_server_contract.assign_roles(
+        account=accounts.admin,
+        pseudonym=accounts.alice.pseudonym,
+        roles=["operator"]
+    )
+
+    identity_server_contract.add_to_whitelist(
+        account=accounts.admin,
+        pseudonym=accounts.bob.pseudonym,
+        interface="controller",
+        roles=["operator"],
+    )
+
     drone_simulation = DroneSimulation(
         account=accounts.bob,
         websocket_location=Location(host="localhost", port=9876),
         identity_server_contract=identity_server_contract,
     )
+
+    await sleep(1)
 
     operator = Operator(
         account=accounts.alice,

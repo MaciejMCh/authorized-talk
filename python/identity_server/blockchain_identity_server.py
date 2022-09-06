@@ -7,7 +7,7 @@ from python.medium.kinds import TargetMedium, WebsocketTargetMedium
 from python.websocket.location import Location
 
 
-DEBUG = True
+DEBUG = False
 
 
 class BlockchainIdentityServer(IdentityServer):
@@ -31,7 +31,7 @@ class BlockchainIdentityServer(IdentityServer):
         return actor[0] if actor[2] else None
 
     async def has_access(self, source_pseudonym: str, interface_identity: InterfaceIdentity) -> bool:
-        return await self.identity_server_contract.has_access(source_pseudonym, interface_identity.pseudonym, interface_identity.interface)
+        return self.identity_server_contract.has_access(source_pseudonym, interface_identity.pseudonym, interface_identity.interface)
 
 
 def debug_print(message: str):

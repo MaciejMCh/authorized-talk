@@ -30,8 +30,8 @@ class Commander:
         self.rsa_keys = RsaKeys.generate()
         self.nonce = 0
         self.pending_commands: Dict[int, Future[Message]] = {}
-        self.initialize()
         self.medium: Optional[AuthorizedClientMedium] = None
+        self.initialize()
 
     def initialize(self):
         self.connect_to_identity_server()

@@ -8,6 +8,8 @@ from python.example.protobuf_utils import parse_system_object
 
 
 def commands_for_interface(actor_type: GeneratedProtocolMessageType, interface: str):
+    if interface is None:
+        raise Exception("interface argument is required")
     result: List[str] = []
     descriptor: Descriptor = actor_type.DESCRIPTOR
     actor_object_type, interfaces_fields = parse_system_object(descriptor)

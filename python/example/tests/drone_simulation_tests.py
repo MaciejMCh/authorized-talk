@@ -25,6 +25,19 @@ class DroneSimulationTestCase(unittest.IsolatedAsyncioTestCase):
             identity_server_contract=identity_server_contract,
         )
 
+        identity_server_contract.assign_roles(
+            account=accounts.admin,
+            pseudonym=accounts.alice.pseudonym,
+            roles=["operator"]
+        )
+
+        identity_server_contract.add_to_whitelist(
+            account=accounts.admin,
+            pseudonym=accounts.bob.pseudonym,
+            interface="controller",
+            roles=["operator"],
+        )
+
         operator = Operator(
             account=accounts.alice,
             target=InterfaceIdentity(

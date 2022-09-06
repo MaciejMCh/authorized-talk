@@ -1,7 +1,7 @@
 import rsa
 
 
-DEBUG = True
+DEBUG = False
 
 
 class RsaKeys:

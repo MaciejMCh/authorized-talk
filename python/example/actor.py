@@ -15,7 +15,7 @@ from python.websocket.location import Location
 from python.websocket.server import run_server, WebsocketServerSession
 
 
-DEBUG = True
+DEBUG = False
 
 
 class Actor:
@@ -53,10 +53,10 @@ class Actor:
                     identity_server=self.identity_server,
                     random=BuiltInRandom(),
                 )
-                interface = await medium.authorized
+                await medium.authorized
                 implement_interface(
                     actor_type=self.actor_type,
-                    interface=interface,
+                    interface=medium.interface,
                     medium=medium,
                     handle_command=self.handle_command,
                 )

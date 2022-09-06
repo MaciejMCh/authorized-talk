@@ -78,7 +78,7 @@ class AuthorizedClientMedium(Medium):
             message=signature_message,
             private_key=self.rsa_keys.private_key,
         )
-        debug_print(f"introduction signature message: {signature_message}")
+        debug_print(f"introduction:\n\tsignature message:\t\t{signature_message}")
 
         introduction = Introduction(
             pseudonym=self.pseudonym,
@@ -170,6 +170,7 @@ class AuthorizedClientMedium(Medium):
             self.fail(InvalidChallengeSignature())
 
     def fail(self, reason: ClientException):
+        debug_print(f"fail:\t\t{reason}")
         self.status = Status.FAILED
         self.failure.set_result(reason)
 

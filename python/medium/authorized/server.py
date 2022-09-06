@@ -35,6 +35,7 @@ class AuthorizedServerMedium(Medium):
         self.rsa_keys = rsa_keys
         self.identity_server = identity_server
         self.random = random
+        self.interface: Optional[str] = None
         self.source_public_key: Optional[bytes] = None
         self.otp: Optional[bytes] = None
         self.source_pseudonym: Optional[str] = None
@@ -87,6 +88,7 @@ class AuthorizedServerMedium(Medium):
             introduction_bytes = RsaEncryption.decrypt(cipher=message, private_key=self.rsa_keys.private_key)
             introduction = Introduction()
             introduction.ParseFromString(introduction_bytes)
+            self.interface = introduction.targetInterface
             self.source_public_key = await self.identity_server.get_public_key(introduction.pseudonym)
             if self.source_public_key is None:
                 self.fail(SourceNotIdentified())

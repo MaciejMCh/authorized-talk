@@ -9,7 +9,7 @@ from eth_typing.evm import Address
 from web3.exceptions import SolidityError
 
 
-DEBUG = True
+DEBUG = False
 
 
 WebsocketLocation = Tuple[str, int]

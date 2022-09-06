@@ -50,6 +50,9 @@ class AuthorizedServerMedium(Medium):
         if self.status == Status.CHALLENGED:
             create_task(self.receive_challenge_answer(message))
             return
+        if self.status == Status.AUTHORIZED:
+            self.receive_message(message)
+            return 
 
     async def receive_challenge_answer(self, message: bytes):
         try:

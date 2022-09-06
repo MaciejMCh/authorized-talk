@@ -67,22 +67,23 @@ def make_one_of_prototype(fields_descriptors: List[FieldDescriptor]):
     for field_descriptor_in_one_of in fields_descriptors_in_one_of:
         field_descriptor_in_one_of.containing_oneof = one_of_descriptor
 
-    fields: List[FieldDescriptor] = []
-    fields.append(FieldDescriptor(
-        name="nonce",
-        full_name="nonce",
-        index=0,
-        containing_type=None,
-        cpp_type=2,
-        default_value=0,
-        enum_type=None,
-        extension_scope=None,
-        is_extension=False,
-        label=1,
-        message_type=None,
-        number=index + 1,
-        type=3,
-    ))
+    fields: List[FieldDescriptor] = [
+        FieldDescriptor(
+            name="nonce",
+            full_name="nonce",
+            index=0,
+            containing_type=None,
+            cpp_type=4,
+            default_value=0,
+            enum_type=None,
+            extension_scope=None,
+            is_extension=False,
+            label=1,
+            message_type=None,
+            number=index + 1,
+            type=4,
+        )
+    ]
     for field_descriptor_in_one_of in fields_descriptors_in_one_of:
         fields.append(field_descriptor_in_one_of)
 

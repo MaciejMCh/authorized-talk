@@ -1,4 +1,5 @@
 import unittest
+from asyncio import sleep
 
 from python.blockchain.blockchain import Blockchain
 from python.blockchain.identity_server_contract import IdentityServerContract
@@ -19,12 +20,6 @@ class DroneSimulationTestCase(unittest.IsolatedAsyncioTestCase):
             account=accounts.admin,
         )
 
-        drone_simulation = DroneSimulation(
-            account=accounts.bob,
-            websocket_location=Location(host="localhost", port=9876),
-            identity_server_contract=identity_server_contract,
-        )
-
         identity_server_contract.assign_roles(
             account=accounts.admin,
             pseudonym=accounts.alice.pseudonym,
@@ -38,6 +33,14 @@ class DroneSimulationTestCase(unittest.IsolatedAsyncioTestCase):
             roles=["operator"],
         )
 
+        drone_simulation = DroneSimulation(
+            account=accounts.bob,
+            websocket_location=Location(host="localhost", port=9876),
+            identity_server_contract=identity_server_contract,
+        )
+
+        await sleep(1)
+
         operator = Operator(
             account=accounts.alice,
             target=InterfaceIdentity(
@@ -46,6 +49,8 @@ class DroneSimulationTestCase(unittest.IsolatedAsyncioTestCase):
             ),
             identity_server_contract=identity_server_contract,
         )
+
+        await sleep(1)
 
         await operator.verify_drone()
 

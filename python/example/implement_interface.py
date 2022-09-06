@@ -1,6 +1,8 @@
+from asyncio import create_task
 from typing import Tuple, List, Callable
 from python.example.commands_for_interface import commands_for_interface
 from python.example.one_of_all_commands import one_of_all_commands
+from python.example.proto.system_pb2 import Result
 from python.example.protobuf_utils import parse_system_object
 from python.example.resolve_result_type import resolve_result_type
 from python.medium.medium import Medium
@@ -24,6 +26,13 @@ def implement_interface(
     OneOfAllCommands = one_of_all_commands(actor_type)
     commands_whitelist = commands_for_interface(actor_type=actor_type, interface=interface)
 
+    async def send_result_back(result: Message, nonce: int):
+        result = Result(
+            requestNonce=nonce,
+            result=result.SerializeToString(),
+        )
+        await medium.send(result.SerializeToString())
+
     def on_message(message: bytes):
         one_of_all = OneOfAllCommands()
         one_of_all.ParseFromString(message)
@@ -37,6 +46,7 @@ def implement_interface(
         result = handle_command(the_one_property)
         if result.DESCRIPTOR is not ResultType.DESCRIPTOR:
             raise InvalidResultType(result=result, expected_type=ResultType)
+        create_task(send_result_back(result=result, nonce=one_of_all.nonce))
 
     medium.handle_message(on_message)
 

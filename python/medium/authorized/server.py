@@ -16,7 +16,7 @@ from python.medium.authorized.utils import access_pass_signature
 from python.messages.whisper_control_pb2 import Introduction, IntroductionReaction, Challenge, ChallengeAnswer, AccessPass
 
 
-DEBUG = True
+DEBUG = False
 
 
 class AuthorizedServerMedium(Medium):

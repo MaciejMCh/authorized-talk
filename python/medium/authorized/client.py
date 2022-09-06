@@ -18,7 +18,7 @@ from python.messages.whisper_control_pb2 import Introduction, Challenge, Challen
     IntroductionReaction
 
 
-DEBUG = True
+DEBUG = False
 
 
 class AuthorizedClientMedium(Medium):

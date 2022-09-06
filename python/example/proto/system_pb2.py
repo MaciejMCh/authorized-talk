@@ -14,7 +14,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0csystem.proto\"\x07\n\x05\x41\x63tor\"\x0b\n\tInterface\"\t\n\x07\x43ommand\"\t\n\x07Message\"\x1e\n\x06Result\x12\x14\n\x0crequestNonce\x18\x65 \x01(\x04\"\t\n\x07Success\"u\n\x05\x44rone\x12\x1a\n\nsystemBase\x18\x01 \x01(\x0b\x32\x06.Actor\x12&\n\ttelemetry\x18\x02 \x01(\x0b\x32\x13.TelemetryInterface\x12(\n\ncontroller\x18\x03 \x01(\x0b\x32\x14.ControllerInterface\"\x94\x01\n\x12TelemetryInterface\x12\x1e\n\nsystemBase\x18\x01 \x01(\x0b\x32\n.Interface\x12%\n\rreadTelemetry\x18\x02 \x01(\x0b\x32\x0e.ReadTelemetry\x12\x37\n\x16telemetryUpdateMessage\x18\x03 \x01(\x0b\x32\x17.TelemetryUpdateMessage\"C\n\rReadTelemetry\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Command\x12\x14\n\x0cupdatePeriod\x18\x02 \x01(\x02\"L\n\x16TelemetryUpdateMessage\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Message\x12\x14\n\x0c\x62\x61tteryLevel\x18\x02 \x01(\x02\"P\n\x13\x43ontrollerInterface\x12\x1e\n\nsystemBase\x18\x01 \x01(\x0b\x32\n.Interface\x12\x19\n\x07takeOff\x18\x02 \x01(\x0b\x32\x08.TakeOff\"\x89\x01\n\x07TakeOff\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Command\x1a`\n\x06Result\x12\x1b\n\x07success\x18\x01 \x01(\x0b\x32\x08.SuccessH\x00\x12/\n\x11invalidDroneState\x18\x02 \x01(\x0b\x32\x12.InvalidDroneStateH\x00\x42\x08\n\x06result\"\x13\n\x11InvalidDroneStateb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0csystem.proto\"\x07\n\x05\x41\x63tor\"\x0b\n\tInterface\"\t\n\x07\x43ommand\"\t\n\x07Message\".\n\x06Result\x12\x14\n\x0crequestNonce\x18\x01 \x01(\x04\x12\x0e\n\x06result\x18\x02 \x01(\x0c\"\t\n\x07Success\"u\n\x05\x44rone\x12\x1a\n\nsystemBase\x18\x01 \x01(\x0b\x32\x06.Actor\x12&\n\ttelemetry\x18\x02 \x01(\x0b\x32\x13.TelemetryInterface\x12(\n\ncontroller\x18\x03 \x01(\x0b\x32\x14.ControllerInterface\"\x94\x01\n\x12TelemetryInterface\x12\x1e\n\nsystemBase\x18\x01 \x01(\x0b\x32\n.Interface\x12%\n\rreadTelemetry\x18\x02 \x01(\x0b\x32\x0e.ReadTelemetry\x12\x37\n\x16telemetryUpdateMessage\x18\x03 \x01(\x0b\x32\x17.TelemetryUpdateMessage\"C\n\rReadTelemetry\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Command\x12\x14\n\x0cupdatePeriod\x18\x02 \x01(\x02\"L\n\x16TelemetryUpdateMessage\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Message\x12\x14\n\x0c\x62\x61tteryLevel\x18\x02 \x01(\x02\"P\n\x13\x43ontrollerInterface\x12\x1e\n\nsystemBase\x18\x01 \x01(\x0b\x32\n.Interface\x12\x19\n\x07takeOff\x18\x02 \x01(\x0b\x32\x08.TakeOff\"\x89\x01\n\x07TakeOff\x12\x1c\n\nsystemBase\x18\x01 \x01(\x0b\x32\x08.Command\x1a`\n\x06Result\x12\x1b\n\x07success\x18\x01 \x01(\x0b\x32\x08.SuccessH\x00\x12/\n\x11invalidDroneState\x18\x02 \x01(\x0b\x32\x12.InvalidDroneStateH\x00\x42\x08\n\x06result\"\x13\n\x11InvalidDroneStateb\x06proto3')
 
 
 
@@ -143,23 +143,23 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _MESSAGE._serialized_start=49
   _MESSAGE._serialized_end=58
   _RESULT._serialized_start=60
-  _RESULT._serialized_end=90
-  _SUCCESS._serialized_start=92
-  _SUCCESS._serialized_end=101
-  _DRONE._serialized_start=103
-  _DRONE._serialized_end=220
-  _TELEMETRYINTERFACE._serialized_start=223
-  _TELEMETRYINTERFACE._serialized_end=371
-  _READTELEMETRY._serialized_start=373
-  _READTELEMETRY._serialized_end=440
-  _TELEMETRYUPDATEMESSAGE._serialized_start=442
-  _TELEMETRYUPDATEMESSAGE._serialized_end=518
-  _CONTROLLERINTERFACE._serialized_start=520
-  _CONTROLLERINTERFACE._serialized_end=600
-  _TAKEOFF._serialized_start=603
-  _TAKEOFF._serialized_end=740
-  _TAKEOFF_RESULT._serialized_start=644
-  _TAKEOFF_RESULT._serialized_end=740
-  _INVALIDDRONESTATE._serialized_start=742
-  _INVALIDDRONESTATE._serialized_end=761
+  _RESULT._serialized_end=106
+  _SUCCESS._serialized_start=108
+  _SUCCESS._serialized_end=117
+  _DRONE._serialized_start=119
+  _DRONE._serialized_end=236
+  _TELEMETRYINTERFACE._serialized_start=239
+  _TELEMETRYINTERFACE._serialized_end=387
+  _READTELEMETRY._serialized_start=389
+  _READTELEMETRY._serialized_end=456
+  _TELEMETRYUPDATEMESSAGE._serialized_start=458
+  _TELEMETRYUPDATEMESSAGE._serialized_end=534
+  _CONTROLLERINTERFACE._serialized_start=536
+  _CONTROLLERINTERFACE._serialized_end=616
+  _TAKEOFF._serialized_start=619
+  _TAKEOFF._serialized_end=756
+  _TAKEOFF_RESULT._serialized_start=660
+  _TAKEOFF_RESULT._serialized_end=756
+  _INVALIDDRONESTATE._serialized_start=758
+  _INVALIDDRONESTATE._serialized_end=777
 # @@protoc_insertion_point(module_scope)

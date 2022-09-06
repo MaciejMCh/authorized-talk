@@ -52,6 +52,8 @@ async def main():
         identity_server_contract=identity_server_contract,
     )
 
+    await sleep(5)
+
     await operator.verify_drone()
 
     # self.assertIsInstance(drone_simulation.drone_simulation_controller.command, TakeOff, "command should be take of")

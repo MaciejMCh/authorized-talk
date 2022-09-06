@@ -1,6 +1,7 @@
 import unittest
 from python.encryption.rsa_encryption import RsaEncryption
-from python.medium.authorized.server_exceptions import ReceivedInvalidCipher, ReceivedInvalidIntroductionSignature, AccessDenied
+from python.medium.authorized.server_exceptions import ReceivedInvalidCipher, ReceivedInvalidIntroductionSignature, \
+    AccessDenied, SourceNotIdentified
 from python.medium.authorized.server_status import Status
 from python.medium.authorized.utils import introduction_signature
 from python.messages.whisper_control_pb2 import Introduction
@@ -37,7 +38,7 @@ class ServerInitialTestCase(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(medium.status, Status.FAILED, "after receiving invalid signature, state should be failed")
         self.assertIsInstance(error, ReceivedInvalidIntroductionSignature, "receiving invalid signature, should raise ReceivedInvalidIntroductionSignature")
 
-    async def test_deny_access(self):
+    async def test_deny_access_for_not_authorized(self):
         medium, client, close = await with_initial_status(TestIdentityServer(
             target_mediums_by_pseudonyms={'alice': []},
             public_keys_by_pseudonyms={'alice': alice_rsa_keys.public_key},
@@ -69,6 +70,39 @@ class ServerInitialTestCase(unittest.IsolatedAsyncioTestCase):
         await close()
         self.assertEqual(medium.status, Status.FAILED, "not authorized actor should be rejected")
         self.assertIsInstance(error, AccessDenied, "receiving introduction from not authorized actor should raise AccessDenied")
+
+    async def test_deny_access_for_not_identified(self):
+        medium, client, close = await with_initial_status(TestIdentityServer(
+            target_mediums_by_pseudonyms={'alice': []},
+            public_keys_by_pseudonyms={},
+            white_list={'bob': {'some_interface': ['master']}},
+            roles={'alice': []}
+        ))
+
+        signature = RsaEncryption.sign(
+            message=introduction_signature(
+                pseudonym="alice",
+                target_interface="some_interface",
+                nonce=b"some_nonce",
+            ),
+            private_key=alice_rsa_keys.private_key,
+        )
+
+        introduction = Introduction(
+            pseudonym="alice",
+            targetInterface="some_interface",
+            nonce=b"some_nonce",
+            signature=signature,
+        )
+        introduction_bytes = introduction.SerializeToString()
+        introduction_cipher = RsaEncryption.encrypt(message=introduction_bytes, public_key=bob_public_key)
+
+        await client.send(introduction_cipher)
+
+        error = await medium.failure
+        await close()
+        self.assertEqual(medium.status, Status.FAILED, "not authorized actor should be rejected")
+        self.assertIsInstance(error, SourceNotIdentified, "receiving introduction from not identified actor should raise SourceNotIdentified")
 
 
 if __name__ == '__main__':

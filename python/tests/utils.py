@@ -56,7 +56,7 @@ class TestIdentityServer(IdentityServer):
         if pseudonym not in self.target_mediums_by_pseudonyms:
             raise TargetNotFound()
 
-        return self.public_keys_by_pseudonyms[pseudonym]
+        return self.public_keys_by_pseudonyms[pseudonym] if pseudonym in self.public_keys_by_pseudonyms else None
 
     async def has_access(self, source_pseudonym: str, interface_identity: InterfaceIdentity) -> bool:
         if interface_identity.pseudonym not in self.white_list:

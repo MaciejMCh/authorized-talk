@@ -20,5 +20,5 @@ class Operator:
         )
 
     async def verify_drone(self) -> bool:
-        take_off_result: TakeOff.Result = self.commander.send(TakeOff())
+        take_off_result: TakeOff.Result = await self.commander.send(TakeOff())
         return take_off_result.WhichOneOf("result") == "success"

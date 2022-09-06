@@ -8,12 +8,15 @@ from python.core.rsa_keys import RsaKeys
 from python.encryption.rsa_encryption import RsaEncryption, DecryptionFailed
 from python.identity_server.identity_server import IdentityServer
 from python.medium.authorized.server_exceptions import ServerException, ReceivedInvalidCipher, \
-    ReceivedInvalidIntroductionSignature, AccessDenied, ReceivedInvalidAnswerSignature
+    ReceivedInvalidIntroductionSignature, AccessDenied, ReceivedInvalidAnswerSignature, SourceNotIdentified
 from python.medium.authorized.server_status import Status
 from python.medium.authorized.utils import introduction_signature
 from python.medium.medium import Medium
 from python.medium.authorized.utils import access_pass_signature
 from python.messages.whisper_control_pb2 import Introduction, IntroductionReaction, Challenge, ChallengeAnswer, AccessPass
+
+
+DEBUG = True
 
 
 class AuthorizedServerMedium(Medium):
@@ -52,7 +55,7 @@ class AuthorizedServerMedium(Medium):
             return
         if self.status == Status.AUTHORIZED:
             self.receive_message(message)
-            return 
+            return
 
     async def receive_challenge_answer(self, message: bytes):
         try:
@@ -84,6 +87,9 @@ class AuthorizedServerMedium(Medium):
             introduction = Introduction()
             introduction.ParseFromString(introduction_bytes)
             self.source_public_key = await self.identity_server.get_public_key(introduction.pseudonym)
+            if self.source_public_key is None:
+                self.fail(SourceNotIdentified())
+                return
             if_verified = RsaEncryption.verify(
                 message=introduction_signature(
                     pseudonym=introduction.pseudonym,
@@ -151,6 +157,7 @@ class AuthorizedServerMedium(Medium):
         await self.medium.send(access_pass_cipher)
 
     def fail(self, server_exception: ServerException):
+        debug_print(f"fail: {server_exception}")
         self.status = Status.FAILED
         self.failure.set_result(server_exception)
 
@@ -159,3 +166,8 @@ class AuthorizedServerMedium(Medium):
             raise Exception(f"trying to send message in not authorized state: {self.status}")
 
         await self.medium.send(message)
+
+
+def debug_print(message: str):
+    if DEBUG:
+        print(message)

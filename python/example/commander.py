@@ -34,10 +34,10 @@ class Commander:
             random=BuiltInRandom(),
         )
 
-    def send(self, message: Message) -> Message:
+    async def send(self, message: Message) -> Message:
         self.nonce += 1
         command = compose_command(actor_type=self.target_actor_type, message=message, nonce=self.nonce)
         future: Future[Message] = get_running_loop().create_future()
         self.pending_commands[self.nonce] = future
         command_bytes = command.SerializeToString()
-        self.medium.send(command_bytes)
+        await self.medium.send(command_bytes)

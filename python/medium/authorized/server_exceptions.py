@@ -23,3 +23,7 @@ class AccessDenied(ServerException):
 
 class ReceivedInvalidAnswerSignature(ServerException):
     pass
+
+
+class SourceNotIdentified(ServerException):
+    pass

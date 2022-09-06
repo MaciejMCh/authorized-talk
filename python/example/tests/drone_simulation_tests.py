@@ -39,7 +39,7 @@ class DroneSimulationTestCase(unittest.IsolatedAsyncioTestCase):
             identity_server_contract=identity_server_contract,
         )
 
-        await sleep(1)
+        await sleep(0.1)
 
         operator = Operator(
             account=accounts.alice,
@@ -50,7 +50,7 @@ class DroneSimulationTestCase(unittest.IsolatedAsyncioTestCase):
             identity_server_contract=identity_server_contract,
         )
 
-        await sleep(1)
+        await sleep(0.1)
 
         await operator.verify_drone()
 

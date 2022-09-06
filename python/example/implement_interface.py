@@ -1,7 +1,4 @@
 from typing import Tuple, List, Callable
-
-from google.protobuf.reflection import GeneratedProtocolMessageType
-
 from python.example.commands_for_interface import commands_for_interface
 from python.example.one_of_all_commands import one_of_all_commands
 from python.example.protobuf_utils import parse_system_object

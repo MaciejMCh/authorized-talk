@@ -2,9 +2,13 @@ import asyncio
 from asyncio import gather, sleep
 from typing import Optional
 
+from python.blockchain.blockchain import Blockchain
+from python.blockchain.identity_server_contract import IdentityServerContract
 from python.core.interface_identity import InterfaceIdentity
 from python.core.rsa_keys import RsaKeys
 from python.encryption.rsa_encryption import RsaEncryption
+from python.example.drone_simulation import DroneSimulation
+from python.example.operator import Operator
 from python.medium.authorized.client import AuthorizedClientMedium
 from python.medium.authorized.server import AuthorizedServerMedium
 from python.medium.authorized.utils import introduction_signature
@@ -14,6 +18,7 @@ from python.medium.websocket_medium import WebsocketConnector, WebsocketMedium
 from python.messages.whisper_control_pb2 import Introduction, Challenge, ChallengeAnswer, AccessPass
 from python.tests.authorized_medium.utils import with_introducing_status, with_submitting_status, with_initial_status, \
     with_challenged_status
+from python.tests.smart_contract.test_accounts import test_accounts
 from python.tests.utils import TestIdentityServer, bob_public_key, alice_rsa_keys, bob_private_key, TestRandom
 from python.websocket.location import Location
 from python.websocket.server import run_server
@@ -25,13 +30,31 @@ def assertTrue(condition: bool):
 
 
 async def main():
-    medium, client, close = await with_challenged_status()
-    await client.send(b'invalid cipher')
-    error = await medium.failure
-    await close()
-    # self.assertEqual(medium.status, Status.FAILED, "after receiving invalid cipher, state should be failed")
-    # self.assertIsInstance(error, ReceivedInvalidCipher, "receiving invalid cipher, should raise ReceivedInvalidCipher")
-    # self.assertEqual(Status.CHALLENGED, error.status, "failure should occur on CHALLENGED status")
+    blockchain = Blockchain.local()
+    accounts = test_accounts(blockchain)
+    identity_server_contract = IdentityServerContract.deploy(
+        blockchain=blockchain,
+        account=accounts.admin,
+    )
+
+    drone_simulation = DroneSimulation(
+        account=accounts.bob,
+        websocket_location=Location(host="localhost", port=9876),
+        identity_server_contract=identity_server_contract,
+    )
+
+    operator = Operator(
+        account=accounts.alice,
+        target=InterfaceIdentity(
+            pseudonym=accounts.bob.pseudonym,
+            interface="controller",
+        ),
+        identity_server_contract=identity_server_contract,
+    )
+
+    await operator.verify_drone()
+
+    # self.assertIsInstance(drone_simulation.drone_simulation_controller.command, TakeOff, "command should be take of")
 
 if __name__ == "__main__":
     asyncio.run(main())

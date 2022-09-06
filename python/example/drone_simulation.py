@@ -12,9 +12,9 @@ from python.websocket.location import Location
 class DroneSimulation:
     def __init__(
         self,
-        identity_server_contract: IdentityServerContract,
         account: Account,
         websocket_location: Location,
+        identity_server_contract: IdentityServerContract,
     ):
         self.actor = Actor(
             actor_type=Drone,

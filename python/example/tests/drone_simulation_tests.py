@@ -2,13 +2,16 @@ import unittest
 
 from python.blockchain.blockchain import Blockchain
 from python.blockchain.identity_server_contract import IdentityServerContract
+from python.core.interface_identity import InterfaceIdentity
 from python.example.drone_simulation import DroneSimulation
+from python.example.drone_simulation_controller import TakeOff
+from python.example.operator import Operator
 from python.tests.smart_contract.test_accounts import test_accounts
 from python.websocket.location import Location
 
 
-class DroneSimulationTestCase(unittest.TestCase):
-    def test_command(self):
+class DroneSimulationTestCase(unittest.IsolatedAsyncioTestCase):
+    async def test_command(self):
         blockchain = Blockchain.local()
         accounts = test_accounts(blockchain)
         identity_server_contract = IdentityServerContract.deploy(
@@ -17,14 +20,23 @@ class DroneSimulationTestCase(unittest.TestCase):
         )
 
         drone_simulation = DroneSimulation(
-            identity_server_contract=identity_server_contract,
-            websocket_location=Location(host="localhost", port=9876),
             account=accounts.bob,
+            websocket_location=Location(host="localhost", port=9876),
+            identity_server_contract=identity_server_contract,
         )
 
-        operator = Operator()
+        operator = Operator(
+            account=accounts.alice,
+            target=InterfaceIdentity(
+                pseudonym=accounts.bob.pseudonym,
+                interface="controller",
+            ),
+            identity_server_contract=identity_server_contract,
+        )
 
-        operator.verify_drone()
+        await operator.verify_drone()
+
+        self.assertIsInstance(drone_simulation.drone_simulation_controller.command, TakeOff, "command should be take of")
 
 
 if __name__ == '__main__':

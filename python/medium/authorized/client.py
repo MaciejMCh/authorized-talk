@@ -177,3 +177,9 @@ class AuthorizedClientMedium(Medium):
         await self.medium.send(cipher)
         self.status = Status.SUBMITTING
         self.submitting.set_result(None)
+
+    async def send(self, message: bytes):
+        if self.status != Status.AUTHORIZED:
+            raise Exception(f"attempt to send message in not authorized status: {self.status}")
+
+        await self.medium.send(message)

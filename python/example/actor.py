@@ -1,4 +1,4 @@
-from asyncio import run
+from asyncio import create_task
 from typing import cast, Callable
 from google.protobuf.message import Message
 from google.protobuf.reflection import GeneratedProtocolMessageType
@@ -36,7 +36,7 @@ class Actor:
 
     def initialize(self):
         self.connect_to_identity_server()
-        run(self.open_websocket())
+        create_task(self.open_websocket())
 
     async def open_websocket(self):
         server, server_close = await run_server(self.websocket_location)
@@ -57,7 +57,7 @@ class Actor:
                     medium=medium,
                     handle_command=self.handle_command,
                 )
-            run(do())
+            create_task(do())
 
         server.handle_session_opened(on_session_opened)
 
